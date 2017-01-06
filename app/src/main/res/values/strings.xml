@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">LVN Store</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- category fragment -->
+    <string name="top_free">Top Free</string>
+    <string name="top_paid">Top Paid</string>
+    <string name="movers_shaker">Movers Shaker</string>
+    <string name="top_grossing">Top Grossing</string>
+    <!---->
+
+    <!-- Tab -->
+    <string name="tab_app">Apps</string>
+    <string name="tab_favourite">Favourite</string>
+    <string name="tab_setting">Setting</string>
+    <string name="tab_about">About</string>
+    <!---->
+</resources>

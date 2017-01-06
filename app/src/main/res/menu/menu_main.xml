@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/list_menu"
+        app:showAsAction="always"
+        android:title="Grid"
+        android:orderInCategory="91"
+        android:icon="@mipmap/ic_grid_on_white"/>
+
+    <item
+        android:id="@+id/gird_menu"
+        app:showAsAction="always"
+        android:title="Grid"
+        android:orderInCategory="91"
+        android:icon="@mipmap/ic_list_white"/>
+    <item
+        android:id="@+id/drop_down"
+        android:icon="@mipmap/ic_arrow_drop_down"
+        android:orderInCategory="80"
+        android:title="@string/app_name"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/app"
+        android:title="Apps"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/favorite"
+        android:title="Favourite"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/setting"
+        android:title="Setting"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/about"
+        android:title="About"
+        app:showAsAction="never"/>
+</menu>
