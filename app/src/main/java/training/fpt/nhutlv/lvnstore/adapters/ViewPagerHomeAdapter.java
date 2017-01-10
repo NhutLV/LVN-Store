@@ -2,17 +2,17 @@ package training.fpt.nhutlv.lvnstore.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import training.fpt.nhutlv.lvnstore.fragments.AboutFragment;
 import training.fpt.nhutlv.lvnstore.fragments.FavouriteFragment;
 import training.fpt.nhutlv.lvnstore.fragments.AppsFragment;
-import training.fpt.nhutlv.lvnstore.fragments.SettingFragment;
+import training.fpt.nhutlv.lvnstore.fragments.SettingsFragment;
 
 /**
  * Created by NhutDu on 18/10/2016.
  */
-public class ViewPagerHomeAdapter extends FragmentStatePagerAdapter {
+public class ViewPagerHomeAdapter extends FragmentPagerAdapter {
     int mNumOfTabs;
 
     public ViewPagerHomeAdapter(FragmentManager fm, int NumOfTabs) {
@@ -25,17 +25,13 @@ public class ViewPagerHomeAdapter extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-                AppsFragment tab1 =new AppsFragment();
-                return tab1;
+                return new AppsFragment();
             case 1:
-                FavouriteFragment tab2 = new FavouriteFragment();
-                return tab2;
+                return new FavouriteFragment();
             case 2:
-                SettingFragment tab3 =new SettingFragment();
-                return tab3;
+                return new SettingsFragment();
             case 3:
-                AboutFragment tab4 = new AboutFragment();
-                return tab4;
+                return  new AboutFragment();
             default:
                 return null;
         }

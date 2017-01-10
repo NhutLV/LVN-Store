@@ -4,14 +4,16 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:hardwareAccelerated="true"
         android:theme="@style/AppTheme">
         <activity
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:name=".MainActivity"
+            android:theme="@style/SplashTheme"
+            android:name=".activities.SplashScreenActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,7 +21,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DetailAppActivity"/>
+        <activity android:name=".activities.DetailAppActivity"/>
+        <activity android:theme="@style/SettingsTheme"
+            android:name=".activities.MainActivity"/>
+        <activity
+            android:name=".activities.SettingLanguageActivity"
+            android:theme="@style/DialogTheme">
+        </activity>
+        <activity android:name=".activities.SettingCategoryActivity"
+            android:theme="@style/DialogTheme"/>
+        <activity android:name=".activities.SettingSortActivity"
+                  android:theme="@style/DialogTheme"/>
+        <activity android:name=".activities.SettingRateActivity"
+                  android:theme="@style/DialogTheme"/>
+        <activity android:name=".activities.SettingYearReleaseActivity"
+                  android:theme="@style/DialogTheme"/>
+        <activity android:name=".activities.SupportActivity"
+            android:parentActivityName=".activities.DetailAppActivity"/>
+        <activity android:name=".activities.SignUpActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
 </manifest>

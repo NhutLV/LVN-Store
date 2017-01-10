@@ -11,4 +11,16 @@
     <dimen name="margin_large">20dp</dimen>
 
     <dimen name="fontSizeLarge">18sp</dimen>
+    <dimen name="fontSizeSetting">16sp</dimen>
+    <dimen name="fontSizeXLarge">20sp</dimen>
+
+    <dimen name="radio_button_conner_radius">5dp</dimen>
+    <dimen name="radio_button_stroke_border">1dp</dimen>
+
+    <dimen name="preference_fragment_padding_bottom">0dp</dimen>
+    <!-- Preference fragment padding, sides -->
+    <dimen name="preference_fragment_padding_side">16dp</dimen>
+    <dimen name="width_slide_screen">400dp</dimen>
+
+    <integer name="preference_fragment_scrollbarStyle">0x02000000</integer>
 </resources>

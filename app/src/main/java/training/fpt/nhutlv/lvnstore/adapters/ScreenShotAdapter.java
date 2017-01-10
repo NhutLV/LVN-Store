@@ -8,7 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+
+import io.realm.RealmList;
 import training.fpt.nhutlv.lvnstore.R;
+import training.fpt.nhutlv.lvnstore.entities.RealmString;
 
 /**
  * Created by NhutDu on 29/12/2016.
@@ -17,9 +23,9 @@ import training.fpt.nhutlv.lvnstore.R;
 public class ScreenShotAdapter extends RecyclerView.Adapter<ScreenShotAdapter.ScreenShotViewHolder>{
 
     Context mContext;
-    int [] images;
+    RealmList<RealmString> images;
 
-    public ScreenShotAdapter(Context mContext, int [] images) {
+    public ScreenShotAdapter(Context mContext,RealmList<RealmString> images) {
         this.mContext = mContext;
         this.images = images;
     }
@@ -32,12 +38,12 @@ public class ScreenShotAdapter extends RecyclerView.Adapter<ScreenShotAdapter.Sc
 
     @Override
     public void onBindViewHolder(ScreenShotViewHolder holder, int position) {
-        holder.imageView.setImageDrawable(mContext.getResources().getDrawable(images[position]));
+        Picasso.with(mContext).load(images.get(position).getValue()).into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return images.length;
+        return images.size();
     }
 
     class ScreenShotViewHolder extends RecyclerView.ViewHolder{

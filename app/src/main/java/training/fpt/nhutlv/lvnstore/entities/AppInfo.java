@@ -1,33 +1,44 @@
 package training.fpt.nhutlv.lvnstore.entities;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
 
 /**
  * Created by HCD-Fresher039 on 12/27/2016.
  */
 
-public class AppInfo {
+public class AppInfo extends RealmObject{
+
+    @PrimaryKey
+    private String package_name;
 
     private String title;
     private String category;
     private String description;
     private Date create;
-    private int downloads_min;
-    private int downloads_max;
+    private long downloads_min;
+    private long downloads_max;
     private double price_numeric;
     private String promo_video;
     private float rating;
     private int number_rating;
     private String short_desc;
-    private int size;
-    private List<String> screenshots;
+
+    private long size;
+    private RealmList<RealmString> screenshots;
     private String icon;
     private String developer;
     private String website;
     private String what_is_new;
+    private String market_url;
     private Date market_update;
-    private String package_name;
+    private boolean isFavourite;
 
     //region Getters and Setters
 
@@ -63,20 +74,20 @@ public class AppInfo {
         this.create = create;
     }
 
-    public int getDownloads_min() {
-        return downloads_min;
-    }
-
-    public void setDownloads_min(int downloads_min) {
-        this.downloads_min = downloads_min;
-    }
-
-    public int getDownloads_max() {
+    public long getDownloads_max() {
         return downloads_max;
     }
 
-    public void setDownloads_max(int downloads_max) {
+    public void setDownloads_max(long downloads_max) {
         this.downloads_max = downloads_max;
+    }
+
+    public long getDownloads_min() {
+        return downloads_min;
+    }
+
+    public void setDownloads_min(long downloads_min) {
+        this.downloads_min = downloads_min;
     }
 
     public double getPrice_numeric() {
@@ -86,6 +97,14 @@ public class AppInfo {
     public void setPrice_numeric(double price_numeric) {
         this.price_numeric = price_numeric;
     }
+
+//    public RealmList<RealmString> getScreenshots() {
+//        return screenshots;
+//    }
+//
+//    public void setScreenshots(RealmList<RealmString> screenshots) {
+//        this.screenshots = screenshots;
+//    }
 
     public String getPromo_video() {
         return promo_video;
@@ -119,20 +138,12 @@ public class AppInfo {
         this.short_desc = short_desc;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(long size) {
         this.size = size;
-    }
-
-    public List<String> getScreenshots() {
-        return screenshots;
-    }
-
-    public void setScreenshots(List<String> screenshots) {
-        this.screenshots = screenshots;
     }
 
     public String getIcon() {
@@ -183,10 +194,35 @@ public class AppInfo {
         this.package_name = package_name;
     }
 
+    public boolean isFavourite() {
+        return isFavourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        isFavourite = favourite;
+    }
+
+    public RealmList<RealmString> getScreenshots() {
+        return screenshots;
+    }
+
+    public void setScreenshots(RealmList<RealmString> screenshots) {
+        this.screenshots = screenshots;
+    }
+
+    public String getMarket_url() {
+        return market_url;
+    }
+
+    public void setMarket_url(String market_url) {
+        this.market_url = market_url;
+    }
+
     //endregion
     //region Constructors
 
-    public AppInfo(String title, String category, String icon, float rating, int number_rating, String short_desc) {
+    public AppInfo(String package_name,String title, String category, String icon, float rating, int number_rating, String short_desc) {
+        this.package_name = package_name;
         this.title = title;
         this.category = category;
         this.icon = icon;
@@ -198,6 +234,9 @@ public class AppInfo {
     public AppInfo(String title, String icon) {
         this.title = title;
         this.icon = icon;
+    }
+
+    public AppInfo() {
     }
 
     //endregion

@@ -19,4 +19,38 @@
     <string name="tab_setting">Setting</string>
     <string name="tab_about">About</string>
     <!---->
+
+
+    <string name="err_msg_name">Enter your full name</string>
+    <string name="err_msg_email">Enter valid email address</string>
+    <string name="err_msg_password">Enter the password</string>
+
+    <string name="pref_key_category">pref_category</string>
+    <string name="pref_key_rating">pref_rating</string>
+    <string name="pref_key_release_year">pref_release_year</string>
+    <string name="pref_key_sort">pref_sort</string>
+    <string name="pref_key_language">pref_language</string>
+
+
+    <string name="pref_category_filter">Filter</string>
+    <string name="pref_title_category">Category</string>
+
+    <string name="pref_title_rating">App with rate from</string>
+    <string name="pref_default_rating">3</string>
+
+    <string name="pref_title_release_year">From Release year</string>
+    <string name="pref_default_release_year">2012</string>
+
+    <string name="pref_title_sort">Sort By</string>
+    <string name="pref_default_sort">Release</string>
+    <string name="pref_category_sort">Sort</string>
+
+    <string name="pref_title_language">Language</string>
+    <string name="pref_default_language">Vietnamese</string>
+
+    <string name="back_button_label">Back</string>
+    <string name="next_button_label">Next</string>
+
+    <!-- Optional button to Skip a PreferenceActivity [CHAR LIMIT=20] -->
+    <string name="skip_button_label">Skip</string>
 </resources>

@@ -1,10 +1,24 @@
 package training.fpt.nhutlv.lvnstore.model;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import io.realm.RealmList;
+import io.realm.RealmObject;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import training.fpt.nhutlv.lvnstore.entities.RealmString;
 
 /**
  * Created by NhutDu on 18/12/2016.
@@ -15,35 +29,85 @@ public class Configuration {
 
     private static Retrofit retrofit = null;
 
-    private static final String URL_BASE ="https://api.themoviedb.org/3/";
-    private static final String URL_MOVIE_POPULAR ="https://api.themoviedb.org/3/movie/";
-    private static final String URL_MOVIE_TOP_RATED ="https://api.themoviedb.org/3/movie/";
-    private static final String URL_MOVIE_UPCOMING ="https://api.themoviedb.org/3/movie/popular?api_key=6cb1ab70342ce4b11dc26b59fdf7e442&language=en";
-    private static final String URL_MOVIE_NOW_PLAYING ="https://api.themoviedb.org/3/movie/popular?api_key=6cb1ab70342ce4b11dc26b59fdf7e442&language=en";
-
-
-    private static final String URL_TV_POPULAR ="https://api.themoviedb.org/3/tv/popular?api_key=6cb1ab70342ce4b11dc26b59fdf7e442&language=en";
-    private static final String URL_TV_TOP_RATED ="https://api.themoviedb.org/3/tv/popular?api_key=6cb1ab70342ce4b11dc26b59fdf7e442&language=en";
-    private static final String URL_TV_UPCOMING ="https://api.themoviedb.org/3/tv/popular?api_key=6cb1ab70342ce4b11dc26b59fdf7e442&language=en";
-    private static final String URL_TV_NOW_PLAYING ="https://api.themoviedb.org/3/tv/popular?api_key=6cb1ab70342ce4b11dc26b59fdf7e442&language=en";
+    public static final String BASE_URL = "https://data.42matters.com/api/v2.0/android/apps/";
+    public static final String TOP_FREE = "topselling_free";
+    public static final String TOP_PAID = "topselling_paid";
+    public static final String MOVERS_SHAKER = "movers_shakers";
+    public static final String TOP_GROSSING = "topgrossing";
 
 
     public static Retrofit getClient() {
 
         if (retrofit==null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl(URL_BASE)
-                    .addConverterFactory(GsonConverterFactory.create(createGson()))
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }
         return retrofit;
     }
 
 
-    private static Gson createGson() {
-        return new GsonBuilder().setLenient()
-                .setDateFormat("yyyy-MM-dd")
-                .create();
-    }
+//    private static Gson createGson() {
+//        return new GsonBuilder().setLenient()
+//                .setDateFormat("yyyy-MM-dd")
+//                .create();
+//    }
+
+    static Gson gson = new GsonBuilder()
+
+            .setExclusionStrategies(new ExclusionStrategy() {
+
+                @Override
+
+                public boolean shouldSkipField(FieldAttributes f) {
+
+                    return f.getDeclaringClass().equals(RealmObject.class);
+
+                }
+
+                @Override
+
+                public boolean shouldSkipClass(Class<?> clazz) {
+
+                    return false;
+
+                }
+
+            })
+
+            .registerTypeAdapter(new TypeToken<RealmList<RealmString>>() {}.getType(), new TypeAdapter<RealmList<RealmString>>() {
+
+                @Override
+
+                public void write(JsonWriter out, RealmList<RealmString> value) throws IOException {
+
+                }
+
+                @Override
+
+                public RealmList<RealmString> read(JsonReader in) throws IOException {
+
+                    RealmList<RealmString> list = new RealmList<RealmString>();
+
+                    in.beginArray();
+
+                    while (in.hasNext()) {
+
+                        list.add(new RealmString(in.nextString()));
+
+                    }
+
+                    in.endArray();
+
+                    return list;
+
+                }
+
+            })
+
+            .setLenient()
+            .setDateFormat("yyyy-MM-dd")
+            .create();
 
 }

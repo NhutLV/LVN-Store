@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="list_category">
+        <item>@string/top_free</item>
+        <item>@string/top_paid</item>
+        <item>@string/movers_shaker</item>
+        <item>@string/top_grossing</item>
+    </string-array>
+
+    <string-array name="list_category_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="list_sort">
+        <item>Release Date</item>
+        <item>Rating</item>
+    </string-array>
+
+    <string-array name="list_sort_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="list_language">
+        <item>Vietnamese</item>
+        <item>English</item>
+    </string-array>
+
+    <string-array name="list_language_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+</resources>
