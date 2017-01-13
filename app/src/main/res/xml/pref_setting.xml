@@ -17,24 +17,18 @@
             android:key="@string/pref_key_rating"
             android:title="Movie with rate from"/>
 
-        <EditTextPreference
-            android:key="@string/pref_key_release_year"
-            android:title="From Release Year"
-            android:dialogTitle="From Release Year" />
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:layout="@android:layout/preference_category"
-        android:title="sort">
-
         <ListPreference
-            android:key="@string/pref_key_sort"
-            android:title="Sort By"
-            android:entries="@array/list_sort"
-            android:entryValues="@array/list_sort_values"
-            android:dialogTitle="Sort By" />
-
+            android:key="@string/pref_key_category_show"
+            android:title="Category Show"
+            android:entryValues="@array/list_category_show_values"
+            android:entries="@array/list_category_show"
+            android:dialogTitle="Category Show"/>
     </PreferenceCategory>
+
+    <EditTextPreference
+        android:key="@string/pref_key_release_year"
+        android:title="From Release Year"
+        android:dialogTitle="From Release Year" />
     <PreferenceCategory
         android:layout="@android:layout/preference_category"
         android:title="Language">

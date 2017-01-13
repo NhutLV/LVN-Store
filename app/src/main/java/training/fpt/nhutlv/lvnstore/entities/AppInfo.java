@@ -1,5 +1,8 @@
 package training.fpt.nhutlv.lvnstore.entities;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,7 +16,67 @@ import io.realm.annotations.Required;
  * Created by HCD-Fresher039 on 12/27/2016.
  */
 
-public class AppInfo extends RealmObject{
+public class AppInfo extends RealmObject implements Parcelable{
+
+    protected AppInfo(Parcel in) {
+        package_name = in.readString();
+        title = in.readString();
+        category = in.readString();
+        description = in.readString();
+        downloads_min = in.readLong();
+        downloads_max = in.readLong();
+        price_numeric = in.readDouble();
+        promo_video = in.readString();
+        rating = in.readFloat();
+        number_rating = in.readInt();
+        short_desc = in.readString();
+        size = in.readLong();
+        icon = in.readString();
+        developer = in.readString();
+        website = in.readString();
+        what_is_new = in.readString();
+        market_url = in.readString();
+        isFavourite = in.readByte() != 0;
+    }
+
+    public static final Creator<AppInfo> CREATOR = new Creator<AppInfo>() {
+        @Override
+        public AppInfo createFromParcel(Parcel in) {
+            return new AppInfo(in);
+        }
+
+        @Override
+        public AppInfo[] newArray(int size) {
+            return new AppInfo[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(package_name);
+        parcel.writeString(title);
+        parcel.writeString(category);
+        parcel.writeString(description);
+        parcel.writeLong(downloads_min);
+        parcel.writeLong(downloads_max);
+        parcel.writeDouble(price_numeric);
+        parcel.writeString(promo_video);
+        parcel.writeFloat(rating);
+        parcel.writeInt(number_rating);
+        parcel.writeString(short_desc);
+        parcel.writeLong(size);
+        parcel.writeString(icon);
+        parcel.writeString(developer);
+        parcel.writeString(website);
+        parcel.writeString(what_is_new);
+        parcel.writeString(market_url);
+        parcel.writeByte((byte) (isFavourite ? 1 : 0));
+    }
 
     @PrimaryKey
     private String package_name;
@@ -21,7 +84,7 @@ public class AppInfo extends RealmObject{
     private String title;
     private String category;
     private String description;
-    private Date create;
+    private String created;
     private long downloads_min;
     private long downloads_max;
     private double price_numeric;
@@ -66,12 +129,12 @@ public class AppInfo extends RealmObject{
         this.description = description;
     }
 
-    public Date getCreate() {
-        return create;
+    public String getCreated() {
+        return created;
     }
 
-    public void setCreate(Date create) {
-        this.create = create;
+    public void setCreated(String created) {
+        this.created = created;
     }
 
     public long getDownloads_max() {

@@ -2,10 +2,13 @@ package training.fpt.nhutlv.lvnstore.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -24,12 +28,19 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import io.realm.Realm;
+import io.realm.RealmResults;
 import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.activities.DetailAppActivity;
 import training.fpt.nhutlv.lvnstore.adapters.GridAppAdapter;
 import training.fpt.nhutlv.lvnstore.adapters.ListAppAdapter;
 import training.fpt.nhutlv.lvnstore.entities.AppInfo;
+import training.fpt.nhutlv.lvnstore.event.NumberFavourite;
 import training.fpt.nhutlv.lvnstore.event.RemovePositionEvent;
 import training.fpt.nhutlv.lvnstore.lib.DividerItemDecoration;
 import training.fpt.nhutlv.lvnstore.lib.EndlessRecyclerViewScrollListener;
@@ -50,6 +61,7 @@ import training.fpt.nhutlv.lvnstore.utils.PreferenceState;
 public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickDetailLister {
 
     //region Properties
+
     RecyclerView mRecyclerView;
     ArrayList<AppInfo> mApps = new ArrayList<>();
     ListAppAdapter mAdapter;
@@ -58,6 +70,14 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
     EndlessScrollRecyclerViewListener mScrollListener;
     AppInfoServiceImpl service = new AppInfoServiceImpl(getActivity());
     AVLoadingIndicatorView avi;
+
+    int rating =0;
+    int yearRelease =0;
+
+    @BindView(R.id.refresh)
+    SwipeRefreshLayout mRefreshLayout;
+
+    Realm realm = Realm.getDefaultInstance();
 
     //endregion
 
@@ -86,6 +106,9 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        rating = Integer.parseInt(pref.getString(SettingsFragment.KEY_RATE,"0"));
+        yearRelease = Integer.parseInt(pref.getString(SettingsFragment.KEY_RELEASE_YEAR,"0"));
 //        mApps.add(new AppInfo("com.nhut.ca","ZingMP3","Hello","",5f,120,"hello i love you"));
     }
 
@@ -93,6 +116,7 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(container.getContext()).inflate(R.layout.fragment_list_app,container,false);
+        ButterKnife.bind(this,view);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_main);
         avi = (AVLoadingIndicatorView) view.findViewById(R.id.avi);
         if(getArguments().getInt("STATE")==Constant.LIST){
@@ -116,8 +140,8 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
                     showDataByCategory(manager,Configuration.TOP_GROSSING);
                     break;
             }
-
         }else{
+
             layoutManagerGrid = new GridLayoutManager(getActivity(),2);
             mRecyclerView.setLayoutManager(layoutManagerGrid);
             mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
@@ -152,6 +176,7 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
             mAdapterGrid.notifyDataSetChanged();
         }
 
+
         return view;
 
     }
@@ -165,14 +190,13 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
             if(menu.findItem(R.id.list_menu)!=null)
                 menu.findItem(R.id.list_menu).setVisible(false);
         }
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
     public void eventList(RemovePositionEvent positionEvent){
         if(positionEvent.isCheck()){
             Log.d("TAG","True List");
-            mApps.get(positionEvent.getPosition()).setFavourite(true);
+            mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(true);
         }else{
             Log.d("TAG","False List");
             mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(false);
@@ -201,11 +225,11 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
 
         service.getListByCategoryName(category,1,new Callback<ArrayList<AppInfo>>() {
             @Override
-            public void onResult(ArrayList<AppInfo> movies) {
+            public void onResult(ArrayList<AppInfo> appInfos) {
                 if(avi.isShown())
                     avi.hide();
-                new DataDemo().checkFavourite(movies);
-                mApps.addAll(movies);
+                new DataDemo().checkFavourite(appInfos);
+                mApps.addAll(filterSetting(appInfos,yearRelease,rating));
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -215,9 +239,10 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
             public void onLoadMore(int page, int totalItemsCount) {
                 service.getListByCategoryName(category,page,new Callback<ArrayList<AppInfo>>() {
                     @Override
-                    public void onResult(ArrayList<AppInfo> movies) {
-                        new DataDemo().checkFavourite(movies);
-                        mApps.addAll(movies);
+                    public void onResult(ArrayList<AppInfo> appInfos) {
+                        Log.d("TAGGGGGGG","OK");
+                        new DataDemo().checkFavourite(appInfos);
+                        mApps.addAll(filterSetting(appInfos,yearRelease,rating));
                         mAdapter.notifyDataSetChanged();
                     }
                 });
@@ -229,14 +254,13 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
     private void showDataByCategoryGrid(GridLayoutManager layoutManager, final String category){
         if(!avi.isShown())
             avi.show();
-
         service.getListByCategoryName(category,1,new Callback<ArrayList<AppInfo>>() {
             @Override
-            public void onResult(ArrayList<AppInfo> movies) {
+            public void onResult(ArrayList<AppInfo> appInfos) {
                 if(avi.isShown())
                     avi.hide();
-                new DataDemo().checkFavourite(movies);
-                mApps.addAll(movies);
+                new DataDemo().checkFavourite(appInfos);
+                mApps.addAll(filterSetting(appInfos,yearRelease,rating));
                 mAdapterGrid.notifyDataSetChanged();
             }
         });
@@ -246,9 +270,9 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
             public void onLoadMore(int page, int totalItemsCount) {
                 service.getListByCategoryName(category,page,new Callback<ArrayList<AppInfo>>() {
                     @Override
-                    public void onResult(ArrayList<AppInfo> movies) {
-                        new DataDemo().checkFavourite(movies);
-                        mApps.addAll(movies);
+                    public void onResult(ArrayList<AppInfo> appInfos) {
+                        new DataDemo().checkFavourite(appInfos);
+                        mApps.addAll(filterSetting(appInfos,yearRelease,rating));
                         mAdapterGrid.notifyDataSetChanged();
                     }
                 });
@@ -263,4 +287,41 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         intent.putExtra("package_name",mApps.get(position).getPackage_name());
         startActivity(intent);
     }
+
+    @Override
+    public void onClickFavourite(CheckBox checkBox,int position) {
+        AppInfo app = mApps.get(position);
+        if(checkBox.isChecked()){
+            app.setFavourite(true);
+            realm.beginTransaction();
+            realm.copyToRealm(app);
+            realm.commitTransaction();
+            RealmResults<AppInfo> results = realm.where(AppInfo.class).findAll();
+            EventBus.getDefault().postSticky(new RemovePositionEvent(position,true,app));
+            EventBus.getDefault().postSticky(new NumberFavourite(results.size()));
+
+        }else{
+            realm.beginTransaction();
+            app.setFavourite(false);
+            RealmResults<AppInfo> results = realm.where(AppInfo.class).equalTo("package_name",app.getPackage_name()).findAll();
+            results.deleteAllFromRealm();
+            realm.commitTransaction();
+            RealmResults<AppInfo> results1 = realm.where(AppInfo.class).findAll();
+            EventBus.getDefault().postSticky(new NumberFavourite(results1.size()));
+            EventBus.getDefault().postSticky(new RemovePositionEvent(position,false,app));
+        }
+    }
+
+    private ArrayList<AppInfo> filterSetting(ArrayList<AppInfo> list,int year,int rating){
+        ArrayList<AppInfo> listResult = new ArrayList<>();
+        for (AppInfo app : list) {
+            Log.d("TAGGGG year",app.getCreated().split("-")[0]);
+            int releaseYear = Integer.parseInt(app.getCreated().split("-")[0]);
+            if(app.getRating() >= rating && releaseYear >= year) {
+                listResult.add(app);
+            }
+        }
+        return listResult;
+    }
+
 }

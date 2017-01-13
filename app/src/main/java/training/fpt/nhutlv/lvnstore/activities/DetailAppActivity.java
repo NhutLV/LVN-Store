@@ -109,6 +109,8 @@ public class DetailAppActivity extends AppCompatActivity {
                 mImages = mAppInfo.getScreenshots();
                 Picasso.with(DetailAppActivity.this).load(appInfo.getIcon()).into(mIcon);
 
+                setTitle(appInfo.getTitle());
+
                 mTitle.setText(appInfo.getTitle());
                 mDeveloper.setText(appInfo.getDeveloper());
                 mNumberRating.setText("("+String.valueOf(appInfo.getRating())+")");
@@ -158,6 +160,5 @@ public class DetailAppActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 
 }

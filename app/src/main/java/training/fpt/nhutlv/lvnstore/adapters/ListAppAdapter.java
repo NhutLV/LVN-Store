@@ -109,29 +109,35 @@ public class ListAppAdapter extends RecyclerView.Adapter<ListAppAdapter.ListAppV
             favourite.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(favourite.isChecked()){
-                        app.setFavourite(true);
-                        app.setSize(new Random().nextInt(1000));
-                        realm.beginTransaction();
-                        realm.copyToRealm(app);
-                        realm.commitTransaction();
-                        RealmResults<AppInfo> results = realm.where(AppInfo.class).findAll();
-                        EventBus.getDefault().postSticky(new RemovePositionEvent(getAdapterPosition(),true,app));
-                        EventBus.getDefault().postSticky(new NumberFavourite(results.size()));
-
-
-                    }else{
-                        realm.beginTransaction();
-                        app.setFavourite(false);
-                        RealmResults<AppInfo> results = realm.where(AppInfo.class).equalTo("size",app.getSize()).findAll();
-                        results.deleteAllFromRealm();
-                        realm.commitTransaction();
-                        RealmResults<AppInfo> results1 = realm.where(AppInfo.class).findAll();
-                        EventBus.getDefault().postSticky(new NumberFavourite(results1.size()));
-                        EventBus.getDefault().postSticky(new RemovePositionEvent(getAdapterPosition(),false,app));
-                    }
+                    mMyClickDetailLister.onClickFavourite(favourite,getAdapterPosition());
                 }
             });
+
+//            favourite.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if(favourite.isChecked()){
+//                        app.setFavourite(true);
+//                        realm.beginTransaction();
+//                        realm.copyToRealm(app);
+//                        realm.commitTransaction();
+//                        RealmResults<AppInfo> results = realm.where(AppInfo.class).findAll();
+//                        EventBus.getDefault().postSticky(new RemovePositionEvent(getAdapterPosition(),true,app));
+//                        EventBus.getDefault().postSticky(new NumberFavourite(results.size()));
+//
+//
+//                    }else{
+//                        realm.beginTransaction();
+//                        app.setFavourite(false);
+//                        RealmResults<AppInfo> results = realm.where(AppInfo.class).equalTo("size",app.getSize()).findAll();
+//                        results.deleteAllFromRealm();
+//                        realm.commitTransaction();
+//                        RealmResults<AppInfo> results1 = realm.where(AppInfo.class).findAll();
+//                        EventBus.getDefault().postSticky(new NumberFavourite(results1.size()));
+//                        EventBus.getDefault().postSticky(new RemovePositionEvent(getAdapterPosition(),false,app));
+//                    }
+//                }
+//            });
         }
     }
 
@@ -148,9 +154,11 @@ public class ListAppAdapter extends RecyclerView.Adapter<ListAppAdapter.ListAppV
         mMyClickDetailLister = myClickDetailLister;
     }
 
+
     public interface MyClickDetailLister{
 
         void onCLickItem(int position);
+        void onClickFavourite(CheckBox checkBox,int position);
     }
 }
 

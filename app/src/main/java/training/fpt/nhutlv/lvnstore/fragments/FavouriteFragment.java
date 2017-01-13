@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -32,6 +33,7 @@ import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.activities.DetailAppActivity;
 import training.fpt.nhutlv.lvnstore.adapters.ListAppAdapter;
 import training.fpt.nhutlv.lvnstore.entities.AppInfo;
+import training.fpt.nhutlv.lvnstore.event.NumberFavourite;
 import training.fpt.nhutlv.lvnstore.event.RemovePositionEvent;
 import training.fpt.nhutlv.lvnstore.lib.DividerItemDecoration;
 
@@ -108,7 +110,6 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem item) {
                      // Do something when collapsed
-                        mAdapter.setFilter(mApps);
                         return true;
                     }
 
@@ -173,5 +174,29 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
         Intent intent = new Intent(getActivity(),DetailAppActivity.class);
         intent.putExtra("package_name",mApps.get(position).getPackage_name());
         startActivity(intent);
+    }
+
+    @Override
+    public void onClickFavourite(CheckBox checkBox, int position) {
+        AppInfo app = mApps.get(position);
+        if(checkBox.isChecked()){
+            app.setFavourite(true);
+            realm.beginTransaction();
+            realm.copyToRealm(app);
+            realm.commitTransaction();
+            RealmResults<AppInfo> results = realm.where(AppInfo.class).findAll();
+            EventBus.getDefault().postSticky(new RemovePositionEvent(position,true,app));
+            EventBus.getDefault().postSticky(new NumberFavourite(results.size()));
+
+        }else{
+            realm.beginTransaction();
+            app.setFavourite(false);
+            RealmResults<AppInfo> results = realm.where(AppInfo.class).equalTo("package_name",app.getPackage_name()).findAll();
+            results.deleteAllFromRealm();
+            realm.commitTransaction();
+            RealmResults<AppInfo> results1 = realm.where(AppInfo.class).findAll();
+            EventBus.getDefault().postSticky(new NumberFavourite(results1.size()));
+            EventBus.getDefault().postSticky(new RemovePositionEvent(position,false,app));
+        }
     }
 }

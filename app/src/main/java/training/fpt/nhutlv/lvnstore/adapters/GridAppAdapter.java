@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 import training.fpt.nhutlv.lvnstore.R;
@@ -39,7 +41,7 @@ public class GridAppAdapter extends RecyclerView.Adapter<GridAppAdapter.ListAppV
 
         AppInfo app = mApps.get(position);
         holder.title.setText(app.getTitle());
-
+        Picasso.with(mContext).load(app.getIcon()).placeholder(R.drawable.image).into(holder.icon);
     }
 
     @Override

@@ -12,7 +12,7 @@ import training.fpt.nhutlv.lvnstore.model.response.APIAppInfo;
 
 public interface AppInfoService {
 
-    @GET("top_google_charts.json?limit=20")
+    @GET("top_google_charts.json?limit=10")
     Call<APIAppInfo> getListByName(@Query("list_name") String categoryName,@Query("access_token") String accessToken,@Query("page") int page);
 
 

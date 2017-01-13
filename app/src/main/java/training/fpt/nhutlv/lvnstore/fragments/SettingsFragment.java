@@ -21,10 +21,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String KEY_SORT = "pref_sort";
     public static final String KEY_CATEGORY = "pref_category";
     public static final String KEY_RATE = "pref_rating";
+    public static final String KEY_CATEGORY_SHOW = "pref_category_show";
     public static final String KEY_RELEASE_YEAR = "pref_release_year";
     public static final String KEY_LANGUAGE = "pref_language";
     public static final String IS_CHANGE = "_is_change";
-    public static final String[] listKeys = {KEY_CATEGORY, KEY_RATE, KEY_RELEASE_YEAR, KEY_SORT,KEY_LANGUAGE};
+    public static final String[] listKeys = {KEY_CATEGORY, KEY_RATE, KEY_CATEGORY_SHOW, KEY_SORT,KEY_LANGUAGE};
 
     SharedPreferences pref;
     SettingsFragment mSettingsFragment;
@@ -60,9 +61,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         EditTextPreference releaseYear = (EditTextPreference) findPreference(KEY_RELEASE_YEAR);
         releaseYear.setSummary(pref.getString(KEY_RELEASE_YEAR, "0"));
 
-        ListPreference listSortBy = (ListPreference) findPreference(KEY_SORT);
-        String[] sort = getResources().getStringArray(R.array.list_sort);
-        listSortBy.setSummary(sort[Integer.parseInt(pref.getString(KEY_SORT, "0"))]);
+        ListPreference listCategoryShow = (ListPreference) findPreference(KEY_CATEGORY_SHOW);
+        String[] categoryShow = getResources().getStringArray(R.array.list_category_show);
+        listCategoryShow.setSummary(categoryShow[Integer.parseInt(pref.getString(KEY_CATEGORY_SHOW, "0"))]);
 
         ListPreference listLanguage = (ListPreference) findPreference(KEY_LANGUAGE);
         String[] language = getResources().getStringArray(R.array.list_language);
@@ -82,8 +83,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         SharedPreferences.Editor editor = sharedPreferences.edit();
         switch (key) {
             case KEY_LANGUAGE:
-            case KEY_SORT:
             case KEY_CATEGORY:
+            case KEY_CATEGORY_SHOW:
                 ListPreference list = (ListPreference) findPreference(key);
                 list.setSummary(list.getEntry());
                 break;

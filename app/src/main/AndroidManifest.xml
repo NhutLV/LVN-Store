@@ -24,20 +24,8 @@
         <activity android:name=".activities.DetailAppActivity"/>
         <activity android:theme="@style/SettingsTheme"
             android:name=".activities.MainActivity"/>
-        <activity
-            android:name=".activities.SettingLanguageActivity"
-            android:theme="@style/DialogTheme">
-        </activity>
-        <activity android:name=".activities.SettingCategoryActivity"
-            android:theme="@style/DialogTheme"/>
-        <activity android:name=".activities.SettingSortActivity"
-                  android:theme="@style/DialogTheme"/>
-        <activity android:name=".activities.SettingRateActivity"
-                  android:theme="@style/DialogTheme"/>
-        <activity android:name=".activities.SettingYearReleaseActivity"
-                  android:theme="@style/DialogTheme"/>
         <activity android:name=".activities.SupportActivity"
-            android:parentActivityName=".activities.DetailAppActivity"/>
+                  android:parentActivityName=".activities.DetailAppActivity"/>
         <activity android:name=".activities.SignUpActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>

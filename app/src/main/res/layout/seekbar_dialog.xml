@@ -11,14 +11,20 @@
         android:text="Movie with rate from"
         android:id="@+id/tvTitle"
         android:textSize="18sp" />
-
+    <TextView
+        android:id="@+id/number_seek_bar"
+        android:layout_toRightOf="@+id/tvTitle"
+        android:layout_marginLeft="@dimen/margin_normal"
+        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
     <SeekBar
         android:id="@+id/seekBarRate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvTitle"
         android:layout_marginTop="20dp"
-        android:max="10" />
+        android:max="5" />
 
     <LinearLayout
         android:layout_below="@+id/seekBarRate"

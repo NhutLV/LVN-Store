@@ -2,11 +2,13 @@ package training.fpt.nhutlv.lvnstore.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -81,10 +83,16 @@ public class MainActivity extends AppCompatActivity
 
     TextView mTitle;
 
+    SharedPreferences pref;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        new PreferenceState(this).setDefault();
+
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
@@ -201,21 +209,13 @@ public class MainActivity extends AppCompatActivity
             case R.id.list_menu:
                 if(getSupportFragmentManager().getBackStackEntryCount() >0)
                     getSupportFragmentManager().popBackStack();
-                new PreferenceState(this).saveStateShow(Constant.GRID);
                 UtilsFragment.changeFragment(getSupportFragmentManager(),
                         new ListAppFragment().newInstance(new PreferenceState(this).getStateFragment(),new PreferenceState(this).getStateShow()),
                         R.id.frame);
                 break;
             case R.id.gird_menu:
-                new AppInfoServiceImpl(this).getListByCategoryName("topselling_free", 1, new Callback<ArrayList<AppInfo>>() {
-                    @Override
-                    public void onResult(ArrayList<AppInfo> appInfos) {
-                        Log.d("TAG AppInfo",appInfos.get(0).getScreenshots().get(0).getValue());
-                    }
-                });
                 if(getSupportFragmentManager().getBackStackEntryCount() >0)
                    getSupportFragmentManager().popBackStack();
-                new PreferenceState(this).saveStateShow(Constant.LIST);
                 UtilsFragment.changeFragment(getSupportFragmentManager(),
                         new ListAppFragment().newInstance(new PreferenceState(this).getStateFragment(),new PreferenceState(this).getStateShow()),
                         R.id.frame);

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.fragments.SettingsFragment;
@@ -37,9 +38,29 @@ public class SeekBarDialog extends DialogFragment {
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
         SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBarRate);
+        final TextView numberSeekBar = (TextView) view.findViewById(R.id.number_seek_bar);
+
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
         int progress = Integer.parseInt(pref.getString(SettingsFragment.KEY_RATE, "0"));
         seekBar.setProgress(progress);
+        numberSeekBar.setText(String.valueOf(progress));
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                numberSeekBar.setText(String.valueOf(seekBar.getProgress()));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         Button btnYes = (Button) view.findViewById(R.id.btnYes);
         btnYes.setOnClickListener(new View.OnClickListener() {

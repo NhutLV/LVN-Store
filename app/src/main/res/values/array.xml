@@ -33,4 +33,14 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+
+    <string-array name="list_category_show">
+        <item>List</item>
+        <item>Grid</item>
+    </string-array>
+
+    <string-array name="list_category_show_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 </resources>
