@@ -25,8 +25,8 @@
     </string-array>
 
     <string-array name="list_language">
-        <item>Vietnamese</item>
-        <item>English</item>
+        <item>@string/pref_default_language</item>
+        <item>@string/language_english</item>
     </string-array>
 
     <string-array name="list_language_values">
@@ -35,8 +35,8 @@
     </string-array>
 
     <string-array name="list_category_show">
-        <item>List</item>
-        <item>Grid</item>
+        <item>@string/list</item>
+        <item>@string/grid</item>
     </string-array>
 
     <string-array name="list_category_show_values">

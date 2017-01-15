@@ -10,6 +10,7 @@ public class RemovePositionEvent {
 
     private int position;
     private boolean check;
+    private int tab;
 
     public boolean isCheck() {
         return check;
@@ -37,14 +38,30 @@ public class RemovePositionEvent {
         this.position = position;
     }
 
-    public RemovePositionEvent(int position,boolean check) {
-        this.position = position;
+    public int getTab() {
+        return tab;
+    }
+
+    public void setTab(int tab) {
+        this.tab = tab;
+    }
+
+    public RemovePositionEvent(AppInfo appInfo, boolean check, int tab) {
+        this.appInfo = appInfo;
         this.check = check;
+        this.tab = tab;
     }
 
     public RemovePositionEvent(int position, boolean check, AppInfo appInfo) {
         this.position = position;
         this.check = check;
+        this.appInfo = appInfo;
+    }
+
+    public RemovePositionEvent(int position, boolean check, int tab, AppInfo appInfo) {
+        this.position = position;
+        this.check = check;
+        this.tab = tab;
         this.appInfo = appInfo;
     }
 }

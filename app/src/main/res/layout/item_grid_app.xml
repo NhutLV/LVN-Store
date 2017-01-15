@@ -1,30 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="250dp">
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="@dimen/margin_small"
+    android:layout_height="wrap_content">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ImageView
+            android:layout_alignParentTop="true"
             android:id="@+id/grid_image"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"
+            android:layout_margin="@dimen/margin_small"
             android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
-            android:layout_above="@+id/grid_title"
-            android:src="@drawable/image" />
+            android:src="@drawable/avatar" />
 
         <TextView
             android:id="@+id/grid_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:text="Facebook"
             android:gravity="center"
-            android:layout_alignParentBottom="true"
-            android:textSize="16sp" />
+            android:textColor="@android:color/black"
+            android:layout_below="@+id/grid_image"
+            android:text="Underworld: Blood Wars"
+            android:paddingBottom="@dimen/margin_normal"
+            android:paddingLeft="@dimen/margin_small"
+            android:paddingRight="@dimen/margin_small"
+            android:textSize="14sp" />
     </RelativeLayout>
-</android.support.v7.widget.CardView>
+    </android.support.v7.widget.CardView>

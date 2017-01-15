@@ -5,6 +5,34 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="edit">Edit</string>
+    <string name="category">Category</string>
+    <string name="filter">Filter</string>
+    <string name="from_rating">App with rate from</string>
+    <string name="from_year">From Release year</string>
+    <string name="sort">Sort</string>
+    <string name="sort_by">Sort By</string>
+    <string name="language">Language</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+
+    <!-- Title detail app -->
+    <string name="text_screenshot_detail">ScreenShots</string>
+    <string name="text_description_detail">Description</string>
+    <string name="text_what_is_new_detail">What is new</string>
+    <string name="text_support_detail">Support</string>
+    <string name="text_video_detail">Video</string>
+    <!---->
+
+    <!-- Sign Up -->
+    <string name="text_fullname">Fullname</string>
+    <string name="text_email">Email</string>
+    <string name="text_password">Password</string>
+    <string name="text_gender">Gender</string>
+    <string name="text_gender_male">Male</string>
+    <string name="text_gender_female">Female</string>
+    <string name="sign_up">Sign Up</string>
+    <!---->
 
     <!-- category fragment -->
     <string name="top_free">Top Free</string>
@@ -48,9 +76,15 @@
 
     <string name="pref_title_language">Language</string>
     <string name="pref_default_language">Vietnamese</string>
+    <string name="language_english">English</string>
 
     <string name="back_button_label">Back</string>
     <string name="next_button_label">Next</string>
+
+    <string name="list">List</string>
+    <string name="grid">Grid</string>
+
+    <string name="text_price">Free</string>
 
     <!-- Optional button to Skip a PreferenceActivity [CHAR LIMIT=20] -->
     <string name="skip_button_label">Skip</string>

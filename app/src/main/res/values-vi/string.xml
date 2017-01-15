@@ -1,0 +1,91 @@
+<resources>
+    <string name="app_name">LVN Store</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Cài đặt</string>
+    <string name="edit">Cập nhật</string>
+    <string name="category">Danh mục</string>
+    <string name="filter">Bộ lọc</string>
+    <string name="from_rating">Ứng dụng có rating </string>
+    <string name="from_year">Năm release ứng dụng</string>
+    <string name="sort">Sắp xếp</string>
+    <string name="sort_by">Sắp xếp theo</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="no">Không</string>
+    <string name="yes">Có</string>
+
+    <!-- Title detail app -->
+    <string name="text_screenshot_detail">Hình ảnh</string>
+    <string name="text_description_detail">Mô tả</string>
+    <string name="text_what_is_new_detail">Có gì mới ?</string>
+    <string name="text_support_detail">Hỗ trợ</string>
+    <string name="text_video_detail">Video</string>
+    <!---->
+
+    <!-- Sign Up -->
+    <string name="text_fullname">Họ và tê</string>
+    <string name="text_email">Email</string>
+    <string name="text_password">Mật khẩu</string>
+    <string name="text_gender">Giới tính</string>
+    <string name="text_gender_male">Nam</string>
+    <string name="text_gender_female">Nữ</string>
+    <string name="sign_up">Đăng ký</string>
+    <!---->
+
+    <!-- category fragment -->
+    <string name="top_free">Top Miễn Phí</string>
+    <string name="top_paid">Top Trả Phí</string>
+    <string name="movers_shaker">Xu hướng</string>
+    <string name="top_grossing">Top Doanh Thu</string>
+    <!---->
+
+    <!-- Tab -->
+    <string name="tab_app">Ứng dụng</string>
+    <string name="tab_favourite">Yêu thích</string>
+    <string name="tab_setting">Cài đặt</string>
+    <string name="tab_about">Giới thiệu</string>
+    <!---->
+
+
+    <string name="err_msg_name">Vui lòng nhập họ và tê</string>
+    <string name="err_msg_email">Email không đúng</string>
+    <string name="err_msg_password">Vui lòng nhập mật khẩu</string>
+
+    <string name="pref_key_category">pref_category</string>
+    <string name="pref_key_rating">pref_rating</string>
+    <string name="pref_key_release_year">pref_release_year</string>
+    <string name="pref_key_sort">pref_sort</string>
+    <string name="pref_key_language">pref_language</string>
+    <string name="pref_key_category_show">pref_category_show</string>
+
+
+    <string name="pref_category_filter">Lọc Theo</string>
+    <string name="pref_title_category">Danh mục</string>
+
+    <string name="pref_title_rating">@string/from_rating</string>
+    <string name="pref_default_rating">3</string>
+
+    <string name="pref_title_release_year">@string/from_year</string>
+    <string name="pref_default_release_year">2012</string>
+
+    <string name="pref_title_sort">@string/sort_by</string>
+    <string name="pref_default_sort">Release</string>
+    <string name="pref_category_sort">@string/sort</string>
+
+    <string name="pref_title_language">@string/language</string>
+    <string name="pref_default_language">Tiếng Việt</string>
+    <string name="language_english">Tiếng Anh</string>
+
+    <string name="back_button_label">Back</string>
+    <string name="next_button_label">Next</string>
+
+    <string name="list">Danh sách</string>
+    <string name="grid">Dạng lưới</string>
+
+    <string name="text_price">Miễn Phí</string>
+
+    <!-- Optional button to Skip a PreferenceActivity [CHAR LIMIT=20] -->
+    <string name="skip_button_label">Skip</string>
+</resources>

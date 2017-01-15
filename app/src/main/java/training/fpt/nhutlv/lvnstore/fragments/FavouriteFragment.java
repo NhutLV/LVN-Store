@@ -3,6 +3,8 @@ package training.fpt.nhutlv.lvnstore.fragments;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -24,10 +26,13 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.activities.DetailAppActivity;
@@ -36,15 +41,17 @@ import training.fpt.nhutlv.lvnstore.entities.AppInfo;
 import training.fpt.nhutlv.lvnstore.event.NumberFavourite;
 import training.fpt.nhutlv.lvnstore.event.RemovePositionEvent;
 import training.fpt.nhutlv.lvnstore.lib.DividerItemDecoration;
+import training.fpt.nhutlv.lvnstore.model.storage.AppInfoController;
+import training.fpt.nhutlv.lvnstore.utils.Constant;
 
 /**
  * Created by NhutDu on 18/12/2016.
  */
 
-public class FavouriteFragment extends Fragment implements SearchView.OnQueryTextListener,ListAppAdapter.MyClickDetailLister {
+public class FavouriteFragment extends Fragment implements SearchView.OnQueryTextListener, ListAppAdapter.MyClickDetailLister {
 
     RecyclerView mRecyclerView;
-    ArrayList<AppInfo> mApps = new ArrayList<>();
+    ArrayList<AppInfo> mApps;
     ListAppAdapter mAdapter;
     Realm realm = Realm.getDefaultInstance();
     SearchView searchView;
@@ -57,8 +64,8 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
         setHasOptionsMenu(true);
         EventBus.getDefault().register(this);
         RealmResults<AppInfo> apps = realm.where(AppInfo.class).findAll();
-        mApps.addAll(apps);
         mTemp.addAll(apps);
+        mApps = mTemp;
     }
 
     public static Fragment newInstance() {
@@ -87,7 +94,6 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
 
         super.onCreateOptionsMenu(menu, inflater);
         MenuItem item = menu.findItem(R.id.list_menu);
-
         if (item != null)
             item.setVisible(false);
         menu.findItem(R.id.drop_down).setVisible(false);
@@ -96,41 +102,13 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
             menu.findItem(R.id.drop_up).setVisible(false);
         if (menu.findItem(R.id.gird_menu) != null)
             menu.findItem(R.id.gird_menu).setVisible(false);
-
-
         inflater.inflate(R.menu.menu_favourite, menu);
 
         searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setOnQueryTextListener(this);
-
-        MenuItemCompat.setOnActionExpandListener(item,
-                new MenuItemCompat.OnActionExpandListener() {
-                    @Override
-                    public boolean onMenuItemActionCollapse(MenuItem item) {
-                     // Do something when collapsed
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onMenuItemActionExpand(MenuItem item) {
-                        // Do something when expanded
-                        return true;
-                    }
-                });
     }
-
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void eventFavourite(RemovePositionEvent positionEvent) {
-        if (!positionEvent.isCheck()) {
-            mApps.remove(positionEvent.getPosition());
-        } else {
-            mApps.add(positionEvent.getAppInfo());
-        }
-        mAdapter.notifyDataSetChanged();
-    }
-
 
     @Override
     public void onDestroyView() {
@@ -142,7 +120,6 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
         super.onDestroy();
         EventBus.getDefault().unregister(this);
     }
-
     //search view
     @Override
     public boolean onQueryTextSubmit(String query) {
@@ -151,10 +128,9 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        ArrayList<AppInfo> filteredModelList = filter(mTemp, newText);
-        mApps = filteredModelList;
+        ArrayList<AppInfo> filteredModelList = filter(AppInfoController.getAll(), newText);
         mAdapter.setFilter(filteredModelList);
-        return true;
+        return false;
     }
 
     private ArrayList<AppInfo> filter(List<AppInfo> models, String query) {
@@ -171,32 +147,46 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
 
     @Override
     public void onCLickItem(int position) {
-        Intent intent = new Intent(getActivity(),DetailAppActivity.class);
-        intent.putExtra("package_name",mApps.get(position).getPackage_name());
+        AppInfo appInfo = mApps.get(position);
+        Intent intent = new Intent(getActivity(), DetailAppActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("APP", appInfo);
+        bundle.putString("package_name", "favourite");
+        bundle.putString("title", appInfo.getTitle());
+        intent.putExtras(bundle);
         startActivity(intent);
+        getActivity().overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 
     @Override
     public void onClickFavourite(CheckBox checkBox, int position) {
-        AppInfo app = mApps.get(position);
-        if(checkBox.isChecked()){
-            app.setFavourite(true);
-            realm.beginTransaction();
-            realm.copyToRealm(app);
-            realm.commitTransaction();
-            RealmResults<AppInfo> results = realm.where(AppInfo.class).findAll();
-            EventBus.getDefault().postSticky(new RemovePositionEvent(position,true,app));
-            EventBus.getDefault().postSticky(new NumberFavourite(results.size()));
 
-        }else{
-            realm.beginTransaction();
-            app.setFavourite(false);
-            RealmResults<AppInfo> results = realm.where(AppInfo.class).equalTo("package_name",app.getPackage_name()).findAll();
-            results.deleteAllFromRealm();
-            realm.commitTransaction();
-            RealmResults<AppInfo> results1 = realm.where(AppInfo.class).findAll();
-            EventBus.getDefault().postSticky(new NumberFavourite(results1.size()));
-            EventBus.getDefault().postSticky(new RemovePositionEvent(position,false,app));
+        Log.d("CCCCCCCCCC", "SIZE" + mApps.size());
+        final AppInfo app = mApps.get(position);
+        Log.d("CCCCCCCCCC", "SIZE" + app.getTitle());
+        Log.d("CCCCCCCCCC", "SIZE" + position);
+        RealmResults<AppInfo> infoRealmResults = realm.where(AppInfo.class).findAll();
+        EventBus.getDefault().postSticky(new RemovePositionEvent(position, false, Constant.TAB_FAROURITE, app));
+        EventBus.getDefault().postSticky(new NumberFavourite(infoRealmResults.size()));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void eventFavourite(RemovePositionEvent positionEvent) {
+        final RealmResults<AppInfo> realmList = realm.where(AppInfo.class).findAll();
+        if (!positionEvent.isCheck()) {
+            if(positionEvent.getTab()==Constant.TAB_LIST){
+                AppInfoController.deleteAppInfo(positionEvent.getAppInfo());
+                mApps.clear();
+                mApps.addAll(realmList);
+            }else if(positionEvent.getTab()==Constant.TAB_FAROURITE){
+                AppInfoController.deleteAppInfo(positionEvent.getAppInfo());
+                mApps.remove(positionEvent.getPosition());
+                mAdapter.notifyDataSetChanged();
+            }
+        } else {
+            mApps.add(positionEvent.getAppInfo());
+            mAdapter.notifyDataSetChanged();
         }
+        mAdapter.notifyDataSetChanged();
     }
 }

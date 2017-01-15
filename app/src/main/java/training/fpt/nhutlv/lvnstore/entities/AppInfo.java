@@ -17,67 +17,6 @@ import io.realm.annotations.Required;
  */
 
 public class AppInfo extends RealmObject implements Parcelable{
-
-    protected AppInfo(Parcel in) {
-        package_name = in.readString();
-        title = in.readString();
-        category = in.readString();
-        description = in.readString();
-        downloads_min = in.readLong();
-        downloads_max = in.readLong();
-        price_numeric = in.readDouble();
-        promo_video = in.readString();
-        rating = in.readFloat();
-        number_rating = in.readInt();
-        short_desc = in.readString();
-        size = in.readLong();
-        icon = in.readString();
-        developer = in.readString();
-        website = in.readString();
-        what_is_new = in.readString();
-        market_url = in.readString();
-        isFavourite = in.readByte() != 0;
-    }
-
-    public static final Creator<AppInfo> CREATOR = new Creator<AppInfo>() {
-        @Override
-        public AppInfo createFromParcel(Parcel in) {
-            return new AppInfo(in);
-        }
-
-        @Override
-        public AppInfo[] newArray(int size) {
-            return new AppInfo[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(package_name);
-        parcel.writeString(title);
-        parcel.writeString(category);
-        parcel.writeString(description);
-        parcel.writeLong(downloads_min);
-        parcel.writeLong(downloads_max);
-        parcel.writeDouble(price_numeric);
-        parcel.writeString(promo_video);
-        parcel.writeFloat(rating);
-        parcel.writeInt(number_rating);
-        parcel.writeString(short_desc);
-        parcel.writeLong(size);
-        parcel.writeString(icon);
-        parcel.writeString(developer);
-        parcel.writeString(website);
-        parcel.writeString(what_is_new);
-        parcel.writeString(market_url);
-        parcel.writeByte((byte) (isFavourite ? 1 : 0));
-    }
-
     @PrimaryKey
     private String package_name;
 
@@ -102,8 +41,75 @@ public class AppInfo extends RealmObject implements Parcelable{
     private String market_url;
     private Date market_update;
     private boolean isFavourite;
+    byte [] mImageIcon;
+
+    RealmList<RealmArrayByte> mScreenShotImage;
 
     //region Getters and Setters
+
+    protected AppInfo(Parcel in) {
+        package_name = in.readString();
+        title = in.readString();
+        category = in.readString();
+        description = in.readString();
+        created = in.readString();
+        downloads_min = in.readLong();
+        downloads_max = in.readLong();
+        price_numeric = in.readDouble();
+        promo_video = in.readString();
+        rating = in.readFloat();
+        number_rating = in.readInt();
+        short_desc = in.readString();
+        size = in.readLong();
+        icon = in.readString();
+        developer = in.readString();
+        website = in.readString();
+        what_is_new = in.readString();
+        market_url = in.readString();
+        isFavourite = in.readByte() != 0;
+        mImageIcon = in.createByteArray();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(package_name);
+        dest.writeString(title);
+        dest.writeString(category);
+        dest.writeString(description);
+        dest.writeString(created);
+        dest.writeLong(downloads_min);
+        dest.writeLong(downloads_max);
+        dest.writeDouble(price_numeric);
+        dest.writeString(promo_video);
+        dest.writeFloat(rating);
+        dest.writeInt(number_rating);
+        dest.writeString(short_desc);
+        dest.writeLong(size);
+        dest.writeString(icon);
+        dest.writeString(developer);
+        dest.writeString(website);
+        dest.writeString(what_is_new);
+        dest.writeString(market_url);
+        dest.writeByte((byte) (isFavourite ? 1 : 0));
+        dest.writeByteArray(mImageIcon);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<AppInfo> CREATOR = new Creator<AppInfo>() {
+        @Override
+        public AppInfo createFromParcel(Parcel in) {
+            return new AppInfo(in);
+        }
+
+        @Override
+        public AppInfo[] newArray(int size) {
+            return new AppInfo[size];
+        }
+    };
 
     public String getTitle() {
         return title;
@@ -279,6 +285,22 @@ public class AppInfo extends RealmObject implements Parcelable{
 
     public void setMarket_url(String market_url) {
         this.market_url = market_url;
+    }
+
+    public byte[] getImageIcon() {
+        return mImageIcon;
+    }
+
+    public void setImageIcon(byte[] imageIcon) {
+        mImageIcon = imageIcon;
+    }
+
+    public RealmList<RealmArrayByte> getScreenShotImage() {
+        return mScreenShotImage;
+    }
+
+    public void setScreenShotImage(RealmList<RealmArrayByte> screenShotImage) {
+        mScreenShotImage = screenShotImage;
     }
 
     //endregion

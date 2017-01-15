@@ -1,6 +1,8 @@
 package training.fpt.nhutlv.lvnstore.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
@@ -62,10 +64,15 @@ public class ListAppAdapter extends RecyclerView.Adapter<ListAppAdapter.ListAppV
         holder.shortDesc.setText(app.getShort_desc());
         holder.numberRating.setText("("+String.valueOf(app.getNumber_rating())+")");
         holder.rating.setRating(app.getRating());
-        Picasso.with(mContext).load(app.getIcon()).placeholder(R.drawable.image).into(holder.icon);
+        if(app.getImageIcon()!=null){
+            Bitmap bmp = BitmapFactory.decodeByteArray(app.getImageIcon(), 0, app.getImageIcon().length);
+            holder.icon.setImageBitmap(bmp);
+        }else{
+            Picasso.with(mContext).load(app.getIcon()).placeholder(R.drawable.image).into(holder.icon);
+        }
         LayerDrawable stars = (LayerDrawable) holder.rating.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
-
+        holder.rating.setIsIndicator(true);
         holder.rating.setIsIndicator(false);
 
         holder.favourite.setChecked(app.isFavourite());

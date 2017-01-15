@@ -1,6 +1,8 @@
 package training.fpt.nhutlv.lvnstore.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -31,6 +33,7 @@ import io.realm.RealmList;
 import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.adapters.ScreenShotAdapter;
 import training.fpt.nhutlv.lvnstore.entities.AppInfo;
+import training.fpt.nhutlv.lvnstore.entities.RealmArrayByte;
 import training.fpt.nhutlv.lvnstore.entities.RealmString;
 import training.fpt.nhutlv.lvnstore.model.service.AppInfoServiceImpl;
 import training.fpt.nhutlv.lvnstore.utils.Callback;
@@ -47,10 +50,9 @@ public class DetailAppActivity extends AppCompatActivity {
     RecyclerView mScreenShots;
     ScreenShotAdapter mAdapter;
     RealmList<RealmString> mImages = new RealmList<>();
+    RealmList<RealmArrayByte> mImagesByte = new RealmList<>();
     AppInfo mAppInfo;
     DecimalFormat df = new DecimalFormat("####0");
-    int height;
-    int width;
 
     @BindView(R.id.image_detail)
     ImageView mIcon;
@@ -94,59 +96,86 @@ public class DetailAppActivity extends AppCompatActivity {
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String package_name = getIntent().getStringExtra("package_name");
+        Bundle bundle = getIntent().getExtras();
 
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        height = displaymetrics.heightPixels;
-        width = displaymetrics.widthPixels;
+        String package_name = bundle.getString("package_name");
+        String title = bundle.getString("title");
+        setTitle(title);
 
-        new AppInfoServiceImpl(this).getAppInfoByPackageName(package_name, new Callback<AppInfo>() {
-            @Override
-            public void onResult(final AppInfo appInfo) {
-                Log.d("TAG",appInfo.getTitle());
-                mAppInfo = appInfo;
-                mImages = mAppInfo.getScreenshots();
-                Picasso.with(DetailAppActivity.this).load(appInfo.getIcon()).into(mIcon);
 
-                setTitle(appInfo.getTitle());
+        if(package_name.equals("favourite")){
+            final AppInfo appInfo = bundle.getParcelable("APP");
+            mImagesByte = appInfo.getScreenShotImage();
+//            Picasso.with(DetailAppActivity.this).load(appInfo.getIcon()).placeholder(R.drawable.image).into(mIcon);
+            Bitmap bmp = BitmapFactory.decodeByteArray(appInfo.getImageIcon(), 0, appInfo.getImageIcon().length);
+            mIcon.setImageBitmap(Bitmap.createScaledBitmap(bmp, 150,
+                   150, false));
+            mTitle.setText(appInfo.getTitle());
+            mDeveloper.setText(appInfo.getDeveloper());
+            mNumberRating.setText("("+String.valueOf(appInfo.getRating())+")");
+            mRatingBar.setNumStars(appInfo.getNumber_rating());
+            String price = String.valueOf(df.format(appInfo.getPrice_numeric()* Constant.USDTOVN));
+            mPrice.setText(price.equals("0")?getResources().getString(R.string.text_price):price+" vnđ");
+            mDescription.setText(appInfo.getDescription());
+            mWhatIsNew.setText(appInfo.getWhat_is_new());
+            mUpdateDetail.setText("Update : "+appInfo.getMarket_update());
+            mWebsite.setText(appInfo.getWebsite());
 
-                mTitle.setText(appInfo.getTitle());
-                mDeveloper.setText(appInfo.getDeveloper());
-                mNumberRating.setText("("+String.valueOf(appInfo.getRating())+")");
-                mRatingBar.setNumStars(appInfo.getNumber_rating());
-                mPrice.setText(String.valueOf(df.format(appInfo.getPrice_numeric()* Constant.USDTOVN))+"vnđ");
-                mDescription.setText(appInfo.getDescription());
-                mWhatIsNew.setText(appInfo.getWhat_is_new());
-                mUpdateDetail.setText("Update : "+appInfo.getMarket_update());
+            mWebsite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(DetailAppActivity.this,SupportActivity.class);
+                    intent.putExtra("link_support",appInfo.getWebsite());
+                    startActivity(intent);
+                }
+            });
 
-//                mVideoPromo.loadData("<iframe width=\""+300+"\" height=\"315\" src=\"https://www.youtube.com/embed/UWGg1juRRmw?ps=play&vq=large&rel=0&autohide=1&showinfo=0&autoplay=1\"</iframe>", "text/html",
-//                        "utf-8");
-//                WebSettings webViewSettings = mVideoPromo.getSettings();
-//                webViewSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-//                webViewSettings.setJavaScriptEnabled(true);
-//                webViewSettings.setBuiltInZoomControls(true);
-//                webViewSettings.setPluginState(WebSettings.PluginState.ON);
-                mWebsite.setText(appInfo.getWebsite());
+            mScreenShots = (RecyclerView) findViewById(R.id.recycler_image_detail);
+            mAdapter = new ScreenShotAdapter(DetailAppActivity.this,mImagesByte);
 
-                mWebsite.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(DetailAppActivity.this,SupportActivity.class);
-                        intent.putExtra("link_support",appInfo.getWebsite());
-                        startActivity(intent);
-                    }
-                });
+            LinearLayoutManager layoutManager = new LinearLayoutManager(DetailAppActivity.this,LinearLayoutManager.HORIZONTAL,false);
 
-                mScreenShots = (RecyclerView) findViewById(R.id.recycler_image_detail);
-                mAdapter = new ScreenShotAdapter(DetailAppActivity.this,mImages);
+            mScreenShots.setLayoutManager(layoutManager);
+//            mScreenShots.setAdapter(mAdapter);
+        }else{
+            new AppInfoServiceImpl(this).getAppInfoByPackageName(package_name, new Callback<AppInfo>() {
+                @Override
+                public void onResult(final AppInfo appInfo) {
+                    Log.d("TAG",appInfo.getTitle());
+                    mAppInfo = appInfo;
+                    mImages = mAppInfo.getScreenshots();
+                    Picasso.with(DetailAppActivity.this).load(appInfo.getIcon()).into(mIcon);
+                    mTitle.setText(appInfo.getTitle());
+                    mDeveloper.setText(appInfo.getDeveloper());
+                    mNumberRating.setText("("+String.valueOf(appInfo.getRating())+")");
+                    mRatingBar.setNumStars(appInfo.getNumber_rating());
+                    mPrice.setText(String.valueOf(df.format(appInfo.getPrice_numeric()* Constant.USDTOVN))+"vnđ");
+                    mDescription.setText(appInfo.getDescription());
+                    mWhatIsNew.setText(appInfo.getWhat_is_new());
+                    mUpdateDetail.setText("Update : "+appInfo.getMarket_update());
+                    mWebsite.setText(appInfo.getWebsite());
 
-                LinearLayoutManager layoutManager = new LinearLayoutManager(DetailAppActivity.this,LinearLayoutManager.HORIZONTAL,false);
+                    mWebsite.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(DetailAppActivity.this,SupportActivity.class);
+                            intent.putExtra("link_support",appInfo.getWebsite());
+                            startActivity(intent);
+                        }
+                    });
 
-                mScreenShots.setLayoutManager(layoutManager);
-                mScreenShots.setAdapter(mAdapter);
-            }
-        });
+                    mScreenShots = (RecyclerView) findViewById(R.id.recycler_image_detail);
+                    mAdapter = new ScreenShotAdapter(DetailAppActivity.this,mImagesByte);
+
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(DetailAppActivity.this,LinearLayoutManager.HORIZONTAL,false);
+
+                    mScreenShots.setLayoutManager(layoutManager);
+                    mScreenShots.setAdapter(mAdapter);
+                }
+            });
+        }
+
+
     }
 
     @Override
@@ -155,9 +184,9 @@ public class DetailAppActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

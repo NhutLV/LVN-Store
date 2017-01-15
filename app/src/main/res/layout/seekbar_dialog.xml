@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Movie with rate from"
+        android:text="@string/from_rating"
         android:id="@+id/tvTitle"
         android:textSize="18sp" />
     <TextView
@@ -39,13 +39,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:text="No"/>
+            android:text="@string/no"/>
 
         <Button
             android:id="@+id/btnYes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:text="Yes"/>
+            android:text="@string/yes"/>
     </LinearLayout>
 </RelativeLayout>

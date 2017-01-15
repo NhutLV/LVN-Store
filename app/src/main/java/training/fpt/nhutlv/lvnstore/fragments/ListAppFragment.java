@@ -4,7 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,23 +31,27 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.activities.DetailAppActivity;
 import training.fpt.nhutlv.lvnstore.adapters.GridAppAdapter;
 import training.fpt.nhutlv.lvnstore.adapters.ListAppAdapter;
 import training.fpt.nhutlv.lvnstore.entities.AppInfo;
+import training.fpt.nhutlv.lvnstore.entities.RealmArrayByte;
 import training.fpt.nhutlv.lvnstore.event.NumberFavourite;
 import training.fpt.nhutlv.lvnstore.event.RemovePositionEvent;
 import training.fpt.nhutlv.lvnstore.lib.DividerItemDecoration;
-import training.fpt.nhutlv.lvnstore.lib.EndlessRecyclerViewScrollListener;
 import training.fpt.nhutlv.lvnstore.lib.EndlessScrollRecyclerViewListener;
 import training.fpt.nhutlv.lvnstore.lib.GridSpacingItemDecoration;
 import training.fpt.nhutlv.lvnstore.lib.RecyclerItemClickListener;
@@ -52,7 +60,7 @@ import training.fpt.nhutlv.lvnstore.model.service.AppInfoServiceImpl;
 import training.fpt.nhutlv.lvnstore.utils.Callback;
 import training.fpt.nhutlv.lvnstore.utils.Constant;
 import training.fpt.nhutlv.lvnstore.utils.DataDemo;
-import training.fpt.nhutlv.lvnstore.utils.PreferenceState;
+import training.fpt.nhutlv.lvnstore.utils.UtilsImage;
 
 /**
  * Created by HCD-Fresher039 on 12/27/2016.
@@ -70,9 +78,11 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
     EndlessScrollRecyclerViewListener mScrollListener;
     AppInfoServiceImpl service = new AppInfoServiceImpl(getActivity());
     AVLoadingIndicatorView avi;
+    RealmList<RealmArrayByte> screenshotImage = new RealmList<>();
 
-    int rating =0;
-    int yearRelease =0;
+
+    int rating = 0;
+    int yearRelease = 0;
 
     @BindView(R.id.refresh)
     SwipeRefreshLayout mRefreshLayout;
@@ -82,13 +92,13 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
     //endregion
 
     //region instance
-    public Fragment newInstance(int idFragment,int stateShow){
+    public Fragment newInstance(int idFragment, int stateShow) {
         Fragment fragment = new ListAppFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt("ID",idFragment);
-        bundle.putInt("STATE",stateShow);
+        bundle.putInt("ID", idFragment);
+        bundle.putInt("STATE", stateShow);
         fragment.setArguments(bundle);
-        return  fragment;
+        return fragment;
     }
 
     //endregion
@@ -107,65 +117,75 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        rating = Integer.parseInt(pref.getString(SettingsFragment.KEY_RATE,"0"));
-        yearRelease = Integer.parseInt(pref.getString(SettingsFragment.KEY_RELEASE_YEAR,"0"));
+        rating = Integer.parseInt(pref.getString(SettingsFragment.KEY_RATE, "0"));
+        yearRelease = Integer.parseInt(pref.getString(SettingsFragment.KEY_RELEASE_YEAR, "0"));
 //        mApps.add(new AppInfo("com.nhut.ca","ZingMP3","Hello","",5f,120,"hello i love you"));
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.fragment_list_app,container,false);
-        ButterKnife.bind(this,view);
+        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.fragment_list_app, container, false);
+        ButterKnife.bind(this, view);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_main);
         avi = (AVLoadingIndicatorView) view.findViewById(R.id.avi);
-        if(getArguments().getInt("STATE")==Constant.LIST){
-            mAdapter = new ListAppAdapter(getActivity(),mApps);
+        Log.d("TAG MENU", getArguments().getInt("STATE") + "");
+
+        if (getArguments().getInt("STATE") == Constant.LIST) {
+            Log.d("TAG MENU", "List");
+            mAdapter = new ListAppAdapter(getActivity(), mApps);
             LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-            mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),1));
+            mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 1));
             mRecyclerView.setLayoutManager(manager);
             mRecyclerView.setAdapter(mAdapter);
             mAdapter.setMyClickDetailLister(this);
-            switch (getArguments().getInt("ID")){
+            switch (getArguments().getInt("ID")) {
                 case Constant.TOP_FREE:
-                    showDataByCategory(manager,Configuration.TOP_FREE);
+                    showDataByCategory(manager, Configuration.TOP_FREE);
                     break;
                 case Constant.TOP_PAID:
-                    showDataByCategory(manager,Configuration.TOP_PAID);
+                    showDataByCategory(manager, Configuration.TOP_PAID);
                     break;
                 case Constant.TOP_MOVERS_SHAKER:
-                    showDataByCategory(manager,Configuration.MOVERS_SHAKER);
+                    showDataByCategory(manager, Configuration.MOVERS_SHAKER);
                     break;
                 case Constant.TOP_GROSSING:
-                    showDataByCategory(manager,Configuration.TOP_GROSSING);
+                    showDataByCategory(manager, Configuration.TOP_GROSSING);
                     break;
             }
-        }else{
 
-            layoutManagerGrid = new GridLayoutManager(getActivity(),2);
+        } else {
+            Log.d("TAG MENU", "Grid");
+            layoutManagerGrid = new GridLayoutManager(getActivity(), 2);
             mRecyclerView.setLayoutManager(layoutManagerGrid);
             mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-            mAdapterGrid = new GridAppAdapter(getActivity(),mApps);
+            mAdapterGrid = new GridAppAdapter(getActivity(), mApps);
 
             mRecyclerView.setAdapter(mAdapterGrid);
-            switch (getArguments().getInt("ID")){
+            switch (getArguments().getInt("ID")) {
                 case Constant.TOP_FREE:
-                    showDataByCategoryGrid(layoutManagerGrid,Configuration.TOP_FREE);
+                    showDataByCategoryGrid(layoutManagerGrid, Configuration.TOP_FREE);
                     break;
                 case Constant.TOP_PAID:
-                    showDataByCategoryGrid(layoutManagerGrid,Configuration.TOP_PAID);
+                    showDataByCategoryGrid(layoutManagerGrid, Configuration.TOP_PAID);
                     break;
                 case Constant.TOP_MOVERS_SHAKER:
-                    showDataByCategoryGrid(layoutManagerGrid,Configuration.MOVERS_SHAKER);
+                    showDataByCategoryGrid(layoutManagerGrid, Configuration.MOVERS_SHAKER);
                     break;
                 case Constant.TOP_GROSSING:
-                    showDataByCategoryGrid(layoutManagerGrid,Configuration.TOP_GROSSING);
+                    showDataByCategoryGrid(layoutManagerGrid, Configuration.TOP_GROSSING);
                     break;
             }
             mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
-                    startActivity(new Intent(getActivity(), DetailAppActivity.class));
+                    Intent intent = new Intent(getActivity(), DetailAppActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("APP", mApps.get(position));
+                    bundle.putString("title", mApps.get(position).getTitle());
+                    bundle.putString("package_name", mApps.get(position).getPackage_name());
+                    intent.putExtras(bundle);
+                    startActivity(intent);
                 }
 
                 @Override
@@ -175,42 +195,46 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
             }));
             mAdapterGrid.notifyDataSetChanged();
         }
-
-
         return view;
-
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if(new PreferenceState(getActivity()).getStateShow()==Constant.LIST){
-            if(menu.findItem(R.id.gird_menu)!=null)
+
+        Log.d("MENU", getArguments().getInt("STATE") + "");
+        if (getArguments().getInt("STATE") == Constant.LIST) {
+            if (menu.findItem(R.id.gird_menu) != null)
                 menu.findItem(R.id.gird_menu).setVisible(false);
-        }else{
-            if(menu.findItem(R.id.list_menu)!=null)
+        } else {
+            if (menu.findItem(R.id.list_menu) != null)
                 menu.findItem(R.id.list_menu).setVisible(false);
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
-    public void eventList(RemovePositionEvent positionEvent){
-        if(positionEvent.isCheck()){
-            Log.d("TAG","True List");
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+//    public void eventList(RemovePositionEvent positionEvent){
+//        if(positionEvent.isCheck()){
+//            Log.d("TAG","True List");
+//            mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(true);
+//        }else{
+//            Log.d("TAG","False List");
+//            mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(false);
+//        }
+//        mAdapter.notifyDataSetChanged();
+//    }
+    public void eventList(RemovePositionEvent positionEvent) {
+        if (positionEvent.isCheck()) {
             mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(true);
-        }else{
-            Log.d("TAG","False List");
-            mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(false);
+            mAdapter.notifyDataSetChanged();
+        } else {
+            if (positionEvent.getTab() == Constant.TAB_LIST) {
+                mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(false);
+                mAdapter.notifyDataSetChanged();
+            } else if (positionEvent.getTab() == Constant.TAB_FAROURITE) {
+                new DataDemo().checkFavouriteList(mApps);
+                mAdapter.notifyDataSetChanged();
+            }
         }
-        mAdapter.notifyDataSetChanged();
-    }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
     }
     //endregion
 
@@ -219,17 +243,17 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
-    private void showDataByCategory(LinearLayoutManager layoutManager, final String category){
-        if(!avi.isShown())
+    private void showDataByCategory(LinearLayoutManager layoutManager, final String category) {
+        if (!avi.isShown())
             avi.show();
 
-        service.getListByCategoryName(category,1,new Callback<ArrayList<AppInfo>>() {
+        service.getListByCategoryName(category, 1, new Callback<ArrayList<AppInfo>>() {
             @Override
             public void onResult(ArrayList<AppInfo> appInfos) {
-                if(avi.isShown())
+                if (avi.isShown())
                     avi.hide();
                 new DataDemo().checkFavourite(appInfos);
-                mApps.addAll(filterSetting(appInfos,yearRelease,rating));
+                mApps.addAll(filterSetting(appInfos, yearRelease, rating));
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -237,30 +261,65 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         mScrollListener = new EndlessScrollRecyclerViewListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                service.getListByCategoryName(category,page,new Callback<ArrayList<AppInfo>>() {
+                service.getListByCategoryName(category, page, new Callback<ArrayList<AppInfo>>() {
                     @Override
                     public void onResult(ArrayList<AppInfo> appInfos) {
-                        Log.d("TAGGGGGGG","OK");
                         new DataDemo().checkFavourite(appInfos);
-                        mApps.addAll(filterSetting(appInfos,yearRelease,rating));
+                        mApps.addAll(filterSetting(appInfos, yearRelease, rating));
                         mAdapter.notifyDataSetChanged();
                     }
                 });
             }
         };
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mApps.clear();
+
+                service.getListByCategoryName(category, 1, new Callback<ArrayList<AppInfo>>() {
+                    @Override
+                    public void onResult(ArrayList<AppInfo> appInfos) {
+                        mApps.addAll(new DataDemo().checkFavourite(appInfos));
+                        mAdapter.notifyDataSetChanged();
+                        (new Handler()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRefreshLayout.setRefreshing(false);
+                            }
+                        }, 3000);
+                    }
+                });
+            }
+        });
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition =
+                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
+            }
+        });
+
         mRecyclerView.addOnScrollListener(mScrollListener);
     }
 
-    private void showDataByCategoryGrid(GridLayoutManager layoutManager, final String category){
-        if(!avi.isShown())
+    private void showDataByCategoryGrid(GridLayoutManager layoutManager, final String category) {
+        if (!avi.isShown())
             avi.show();
-        service.getListByCategoryName(category,1,new Callback<ArrayList<AppInfo>>() {
+        service.getListByCategoryName(category, 1, new Callback<ArrayList<AppInfo>>() {
             @Override
             public void onResult(ArrayList<AppInfo> appInfos) {
-                if(avi.isShown())
+                if (avi.isShown())
                     avi.hide();
                 new DataDemo().checkFavourite(appInfos);
-                mApps.addAll(filterSetting(appInfos,yearRelease,rating));
+                mApps.addAll(filterSetting(appInfos, yearRelease, rating));
                 mAdapterGrid.notifyDataSetChanged();
             }
         });
@@ -268,60 +327,148 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         mScrollListener = new EndlessScrollRecyclerViewListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                service.getListByCategoryName(category,page,new Callback<ArrayList<AppInfo>>() {
+                service.getListByCategoryName(category, page, new Callback<ArrayList<AppInfo>>() {
                     @Override
                     public void onResult(ArrayList<AppInfo> appInfos) {
                         new DataDemo().checkFavourite(appInfos);
-                        mApps.addAll(filterSetting(appInfos,yearRelease,rating));
+                        mApps.addAll(filterSetting(appInfos, yearRelease, rating));
                         mAdapterGrid.notifyDataSetChanged();
                     }
                 });
             }
         };
+
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mApps.clear();
+
+                service.getListByCategoryName(category, 1, new Callback<ArrayList<AppInfo>>() {
+                    @Override
+                    public void onResult(ArrayList<AppInfo> appInfos) {
+                        mApps.addAll(new DataDemo().checkFavourite(appInfos));
+                        mAdapter.notifyDataSetChanged();
+                        (new Handler()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRefreshLayout.setRefreshing(false);
+                            }
+                        }, 3000);
+                    }
+                });
+            }
+        });
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition =
+                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
+            }
+        });
         mRecyclerView.addOnScrollListener(mScrollListener);
     }
 
+    //onclick item recycler view
     @Override
     public void onCLickItem(int position) {
-        Intent intent = new Intent(getActivity(),DetailAppActivity.class);
-        intent.putExtra("package_name",mApps.get(position).getPackage_name());
+        Intent intent = new Intent(getActivity(), DetailAppActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("APP", mApps.get(position));
+        bundle.putString("title", mApps.get(position).getTitle());
+        bundle.putString("package_name", mApps.get(position).getPackage_name());
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 
+
+    //onclick favourite
     @Override
-    public void onClickFavourite(CheckBox checkBox,int position) {
+    public void onClickFavourite(CheckBox checkBox, int position) {
         AppInfo app = mApps.get(position);
-        if(checkBox.isChecked()){
+        if (checkBox.isChecked()) {
             app.setFavourite(true);
+            app.setImageIcon(UtilsImage.getImageFromUrl(app.getIcon()));
+            Log.d("TAG Image", Arrays.toString(app.getImageIcon()));
+//            for(int i =0;i<app.getScreenshots().size();i++){
+//               new SaveListImage().execute(app.getScreenshots().get(i).toString());
+//            }
+//            app.setScreenShotImage(screenshotImage);
+//
+//            for (RealmArrayByte a :screenshotImage){
+//                Log.d("CCC",a.toString());
+//            }
             realm.beginTransaction();
             realm.copyToRealm(app);
             realm.commitTransaction();
             RealmResults<AppInfo> results = realm.where(AppInfo.class).findAll();
-            EventBus.getDefault().postSticky(new RemovePositionEvent(position,true,app));
+            EventBus.getDefault().postSticky(new RemovePositionEvent(position, true, app));
             EventBus.getDefault().postSticky(new NumberFavourite(results.size()));
 
-        }else{
+        } else {
             realm.beginTransaction();
             app.setFavourite(false);
-            RealmResults<AppInfo> results = realm.where(AppInfo.class).equalTo("package_name",app.getPackage_name()).findAll();
+            RealmResults<AppInfo> results = realm.where(AppInfo.class).equalTo("package_name", app.getPackage_name()).findAll();
             results.deleteAllFromRealm();
             realm.commitTransaction();
             RealmResults<AppInfo> results1 = realm.where(AppInfo.class).findAll();
             EventBus.getDefault().postSticky(new NumberFavourite(results1.size()));
-            EventBus.getDefault().postSticky(new RemovePositionEvent(position,false,app));
+            EventBus.getDefault().postSticky(new RemovePositionEvent(position, false, Constant.TAB_LIST, app));
         }
     }
 
-    private ArrayList<AppInfo> filterSetting(ArrayList<AppInfo> list,int year,int rating){
+    //filter data from setting
+    private ArrayList<AppInfo> filterSetting(ArrayList<AppInfo> list, int year, int rating) {
         ArrayList<AppInfo> listResult = new ArrayList<>();
         for (AppInfo app : list) {
-            Log.d("TAGGGG year",app.getCreated().split("-")[0]);
-            int releaseYear = Integer.parseInt(app.getCreated().split("-")[0]);
-            if(app.getRating() >= rating && releaseYear >= year) {
+//            int releaseYear = Integer.parseInt(app.getCreated().split("-")[0]);
+            if (app.getRating() >= rating) {
                 listResult.add(app);
             }
         }
         return listResult;
+    }
+
+    class SaveListImage extends AsyncTask<String, Void, RealmList<RealmArrayByte>> {
+
+        @Override
+        protected RealmList<RealmArrayByte> doInBackground(String... strings) {
+            try {
+                URL imageurl = new URL(strings[0]);
+                Bitmap bitmap = BitmapFactory.decodeStream(imageurl.openConnection().getInputStream());
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+                screenshotImage.add(new RealmArrayByte(baos.toByteArray()));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return screenshotImage;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
 }

@@ -1,6 +1,8 @@
 package training.fpt.nhutlv.lvnstore.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 
 import io.realm.RealmList;
 import training.fpt.nhutlv.lvnstore.R;
+import training.fpt.nhutlv.lvnstore.entities.RealmArrayByte;
 import training.fpt.nhutlv.lvnstore.entities.RealmString;
 
 /**
@@ -23,9 +26,9 @@ import training.fpt.nhutlv.lvnstore.entities.RealmString;
 public class ScreenShotAdapter extends RecyclerView.Adapter<ScreenShotAdapter.ScreenShotViewHolder>{
 
     Context mContext;
-    RealmList<RealmString> images;
+    RealmList<RealmArrayByte> images;
 
-    public ScreenShotAdapter(Context mContext,RealmList<RealmString> images) {
+    public ScreenShotAdapter(Context mContext,RealmList<RealmArrayByte> images) {
         this.mContext = mContext;
         this.images = images;
     }
@@ -38,7 +41,9 @@ public class ScreenShotAdapter extends RecyclerView.Adapter<ScreenShotAdapter.Sc
 
     @Override
     public void onBindViewHolder(ScreenShotViewHolder holder, int position) {
-        Picasso.with(mContext).load(images.get(position).getValue()).into(holder.imageView);
+        Bitmap bmp = BitmapFactory.decodeByteArray(images.get(position).getByteImage(), 0, images.get(position).getByteImage().length);
+        holder.imageView.setImageBitmap(Bitmap.createScaledBitmap(bmp, 100,
+                100, false));
     }
 
     @Override

@@ -12,7 +12,7 @@
         android:textAllCaps="true"
         android:layout_marginLeft="@dimen/margin_small"
         android:textSize="@dimen/fontSizeSetting"
-        android:text="Filter"/>
+        android:text="@string/filter"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorBlack"
         android:textSize="@dimen/fontSizeLarge"
-        android:text="Category"/>
+        android:text="@string/category"/>
     <TextView
         android:id="@+id/filter_category"
         android:layout_width="wrap_content"
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorBlack"
         android:textSize="@dimen/fontSizeLarge"
-        android:text="App with rate from"/>
+        android:text="@string/from_rating"/>
     <TextView
         android:id="@+id/filter_rate"
         android:layout_width="wrap_content"
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorBlack"
         android:textSize="@dimen/fontSizeLarge"
-        android:text="From Release year"
+        android:text="@string/from_year"
         android:layout_weight="0.01" />
     <TextView
         android:id="@+id/filter_year_release"
@@ -65,7 +65,7 @@
         android:textAllCaps="true"
         android:layout_marginLeft="@dimen/margin_small"
         android:textSize="@dimen/fontSizeSetting"
-        android:text="Sort"/>
+        android:text="@string/sort"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -77,14 +77,14 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorBlack"
         android:textSize="@dimen/fontSizeLarge"
-        android:text="Sort By"/>
+        android:text="@string/sort_by"/>
     <TextView
         android:id="@+id/sort_by"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/fontSizeSetting"
         android:paddingBottom="@dimen/margin_normal"
-        android:text="Release"/>
+        android:text="List"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorBlack"
         android:textSize="@dimen/fontSizeLarge"
-        android:text="Language"/>
+        android:text="@string/language"/>
     <TextView
         android:id="@+id/language"
         android:layout_width="wrap_content"

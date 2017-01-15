@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -44,21 +45,26 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import training.fpt.nhutlv.lvnstore.MyApplication;
 import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.adapters.ViewPagerHomeAdapter;
 import training.fpt.nhutlv.lvnstore.entities.AppInfo;
 import training.fpt.nhutlv.lvnstore.event.NumberFavourite;
 import training.fpt.nhutlv.lvnstore.fragments.FragmentCategory;
 import training.fpt.nhutlv.lvnstore.fragments.ListAppFragment;
+import training.fpt.nhutlv.lvnstore.fragments.SettingsFragment;
 import training.fpt.nhutlv.lvnstore.model.service.AppInfoServiceImpl;
 import training.fpt.nhutlv.lvnstore.utils.Callback;
 import training.fpt.nhutlv.lvnstore.utils.Constant;
+import training.fpt.nhutlv.lvnstore.utils.NetworkChangeReceiver;
 import training.fpt.nhutlv.lvnstore.utils.PreferenceState;
+import training.fpt.nhutlv.lvnstore.utils.StateShow;
 import training.fpt.nhutlv.lvnstore.utils.UtilsFragment;
+import training.fpt.nhutlv.lvnstore.utils.segmented.SettingLanguage;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener  {
+        implements NavigationView.OnNavigationItemSelectedListener,NetworkChangeReceiver.ConnectivityReceiverListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -81,25 +87,32 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.edit_profile)
     Button mEditProfile;
 
+    @BindView(R.id.connect)
+    TextView mMessage;
+
+    @BindView(R.id.title)
     TextView mTitle;
 
+    @BindView(R.id.retry)
+    TextView mRetry;
+
     SharedPreferences pref;
+    private int category = 0;
+    private int rate = 0;
+    private int year = 0;
+    private int sort = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-
-        new PreferenceState(this).setDefault();
-
+//        new PreferenceState(this).setDefault();
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-
-        mTitle = (TextView) mToolbar.findViewById(R.id.title);
         int index = new PreferenceState(MainActivity.this).getStateFragment();
         String [] categories = getResources().getStringArray(R.array.list_category);
         mTitle.setText(categories[index]);
@@ -114,7 +127,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        Picasso.with(this).load("http://abc/image.jpg").placeholder(R.drawable.image).into(mAvatar);
+        checkConnection();
 
 //        mViewPager = (ViewPager) findViewById(R.id.viewPager);
 //        mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
@@ -126,9 +139,10 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-
         mAdapter = new ViewPagerHomeAdapter(getSupportFragmentManager(),4);
 
+        setDefaultSettingValues();
+        checkChangeSettingAndReloadData(savedInstanceState);
 //        mAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 //        mAdapter.addFragment(AppsFragment.newInstance(),getResources().getString(R.string.tab_app));
 //        mAdapter.addFragment(FavouriteFragment.newInstance(),getResources().getString(R.string.tab_favourite));
@@ -174,8 +188,20 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        Log.d("CCCCCCCC SSSS",new PreferenceState(this).getStateFragment()+"");
+        Log.d("CCCCCCCC SSSS",new PreferenceState(this).getStateShow()+"");
+
+        StateShow.setmCategory(new PreferenceState(this).getStateFragment());
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MyApplication.getInstance().setConnectivityListener(this);
+        checkConnection();
+//        new SettingLanguage(this).setLanguage("vi");
+//        recreate();
+    }
 
     @Override
     protected void onRestart() {
@@ -205,24 +231,23 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
+        if(getSupportFragmentManager().getBackStackEntryCount() >0)
+            getSupportFragmentManager().popBackStack();
+
         switch (item.getItemId()){
             case R.id.list_menu:
-                if(getSupportFragmentManager().getBackStackEntryCount() >0)
-                    getSupportFragmentManager().popBackStack();
+                StateShow.setStateShow(Constant.GRID);
                 UtilsFragment.changeFragment(getSupportFragmentManager(),
-                        new ListAppFragment().newInstance(new PreferenceState(this).getStateFragment(),new PreferenceState(this).getStateShow()),
+                        new ListAppFragment().newInstance(StateShow.getmCategory(), Constant.GRID),
                         R.id.frame);
                 break;
             case R.id.gird_menu:
-                if(getSupportFragmentManager().getBackStackEntryCount() >0)
-                   getSupportFragmentManager().popBackStack();
+                StateShow.setStateShow(Constant.LIST);
                 UtilsFragment.changeFragment(getSupportFragmentManager(),
-                        new ListAppFragment().newInstance(new PreferenceState(this).getStateFragment(),new PreferenceState(this).getStateShow()),
+                        new ListAppFragment().newInstance(StateShow.getmCategory(),Constant.LIST),
                         R.id.frame);
                 break;
             case R.id.drop_down:
-                if(getSupportFragmentManager().getBackStackEntryCount() >0)
-                    getSupportFragmentManager().popBackStack();
                 Fragment childFragment2 = new FragmentCategory();
                 FragmentTransaction transaction2 = getSupportFragmentManager().beginTransaction();
                 transaction2.setCustomAnimations(R.anim.enter_from_bottom,R.anim.enter_from_top);
@@ -231,31 +256,21 @@ public class MainActivity extends AppCompatActivity
                 transaction2.commit();
                 break;
             case R.id.drop_up:
-                if(getSupportFragmentManager().getBackStackEntryCount() >0)
-                    getSupportFragmentManager().popBackStack();
+
                 break;
             case R.id.favorite:
-                if(getSupportFragmentManager().getBackStackEntryCount() >0)
-                   getSupportFragmentManager().popBackStack();
                 mTabLayout.setScrollPosition(1,0f,true);
                 mViewPager.setCurrentItem(1);
                 break;
             case R.id.setting:
-                if(getSupportFragmentManager().getBackStackEntryCount() >0)
-                    getSupportFragmentManager().popBackStack();
                 mTabLayout.setScrollPosition(2,0f,true);
                 mViewPager.setCurrentItem(2);
                 break;
             case R.id.about:
-                if(getSupportFragmentManager().getBackStackEntryCount() >0)
-                    getSupportFragmentManager().popBackStack();
                 mTabLayout.setScrollPosition(3,0f,true);
                 mViewPager.setCurrentItem(3);
                 break;
             case R.id.app:
-                if(getSupportFragmentManager().getBackStackEntryCount() >0)
-                   getSupportFragmentManager().popBackStack();
-
                 mTabLayout.setScrollPosition(0,0f,true);
                 mViewPager.setCurrentItem(0);
                 break;
@@ -275,26 +290,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            new AppInfoServiceImpl(this).getListByCategoryName("topselling_free", 1, new Callback<ArrayList<AppInfo>>() {
-                @Override
-                public void onResult(ArrayList<AppInfo> appInfos) {
-                    Log.d("TAG AppInfo",appInfos.size()+"");
-                }
-            });
-        } else if (id == R.id.nav_gallery) {
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -307,43 +302,6 @@ public class MainActivity extends AppCompatActivity
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    private int getActionBarHeight() {
-        int actionBarHeight = mToolbar.getHeight();
-        if (actionBarHeight != 0)
-            return actionBarHeight;
-        final TypedValue tv = new TypedValue();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-        } else if (getTheme().resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, tv, true))
-            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-        return actionBarHeight;
-    }
-
-    private void showSnackBar(){
-        if(!isNetworkAvailable()){
-            Snackbar snackbar = Snackbar
-                    .make(coordinatorLayout, "Not network connect", 10000)
-                    .setAction("TRY", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            recreate();
-                        }
-                    });
-            snackbar.setActionTextColor(Color.YELLOW);
-
-            View sbView = snackbar.getView();
-            CoordinatorLayout.LayoutParams params=(CoordinatorLayout.LayoutParams)sbView.getLayoutParams();
-            params.gravity = Gravity.TOP;
-            params.topMargin= 100;
-            sbView.setLayoutParams(params);
-
-            sbView.setBackgroundColor(getResources().getColor(R.color.background_snackbar));
-            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
-            textView.setTextColor(Color.WHITE);
-            snackbar.show();
-        }
-    }
     @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
     public void event(NumberFavourite numberFavourite){
         mNumberFavourite.setText(String.valueOf(numberFavourite.getNumberFavourite()));
@@ -357,5 +315,80 @@ public class MainActivity extends AppCompatActivity
 
     public void setTitle(String s){
         mTitle.setText(s);
+    }
+
+    private void checkConnection() {
+        boolean isConnected = NetworkChangeReceiver.isConnected();
+        showMessageConnection(isConnected);
+    }
+
+    private void showMessageConnection(final boolean isConnected) {
+        String message;
+        if (!isConnected) {
+            message = "Sorry! Not connected to internet";
+            mMessage.setVisibility(View.VISIBLE);
+            mRetry.setVisibility(View.VISIBLE);
+            mMessage.setText(message);
+            mRetry.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d("TAGGG","CLICK");
+                   checkConnection();
+                    recreate();
+                }
+            });
+        }else{
+            mMessage.setVisibility(View.GONE);
+            mRetry.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showMessageConnection(isConnected);
+    }
+
+    private void setDefaultSettingValues() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = pref.edit();
+        for (String key : SettingsFragment.listKeys) {
+            if(!pref.contains(key)) {
+                editor.putString(key, "0");
+            }
+        }
+        editor.commit();
+    }
+
+    public void checkChangeSettingAndReloadData(Bundle savedInstanceState) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = pref.edit();
+
+        category = Integer.parseInt(pref.getString(SettingsFragment.KEY_CATEGORY, "0"));
+        rate = Integer.parseInt(pref.getString(SettingsFragment.KEY_RATE, "0"));
+        year = Integer.parseInt(pref.getString(SettingsFragment.KEY_RELEASE_YEAR, "0"));
+        sort = Integer.parseInt(pref.getString(SettingsFragment.KEY_SORT, "0"));
+
+        // Check change config rate
+        boolean isCategoryChange = pref.getBoolean(SettingsFragment.KEY_CATEGORY + SettingsFragment.IS_CHANGE, false);
+        if(isCategoryChange) {
+            editor.putBoolean(SettingsFragment.KEY_CATEGORY + SettingsFragment.IS_CHANGE, false);
+        }
+        boolean isRateChange = pref.getBoolean(SettingsFragment.KEY_RATE + SettingsFragment.IS_CHANGE, false);
+        if(isRateChange) {
+            rate = Integer.parseInt(pref.getString(SettingsFragment.KEY_RATE, "0"));
+            editor.putBoolean(SettingsFragment.KEY_RATE + SettingsFragment.IS_CHANGE, false);
+        }
+        boolean isYearChange = pref.getBoolean(SettingsFragment.KEY_RELEASE_YEAR + SettingsFragment.IS_CHANGE, false);
+        if(isYearChange) {
+            year = Integer.parseInt(pref.getString(SettingsFragment.KEY_RELEASE_YEAR, "0"));
+            editor.putBoolean(SettingsFragment.KEY_RELEASE_YEAR + SettingsFragment.IS_CHANGE, false);
+        }
+        boolean isSortChange = pref.getBoolean(SettingsFragment.KEY_SORT + SettingsFragment.IS_CHANGE, false);
+        if(isSortChange) {
+            sort = Integer.parseInt(pref.getString(SettingsFragment.KEY_SORT, "0"));
+            editor.putBoolean(SettingsFragment.KEY_SORT + SettingsFragment.IS_CHANGE, false);
+        }
+
+        editor.commit();
     }
 }

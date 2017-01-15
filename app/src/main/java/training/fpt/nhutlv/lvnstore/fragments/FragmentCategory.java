@@ -19,6 +19,7 @@ import training.fpt.nhutlv.lvnstore.activities.MainActivity;
 import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.utils.Constant;
 import training.fpt.nhutlv.lvnstore.utils.PreferenceState;
+import training.fpt.nhutlv.lvnstore.utils.StateShow;
 import training.fpt.nhutlv.lvnstore.utils.UtilsFragment;
 
 /**
@@ -59,24 +60,28 @@ public class FragmentCategory extends Fragment {
                 if (new PreferenceState(getActivity()).getStateShow() == Constant.GRID) {
                     switch (i) {
                         case Constant.TOP_FREE:
+                            StateShow.setmCategory(Constant.TOP_FREE);
                             mainActivity.setTitle(getResources().getString(R.string.top_free));
                             UtilsFragment.changeFragment(getActivity().getSupportFragmentManager(),
                                     new ListAppFragment().newInstance(Constant.TOP_FREE,Constant.GRID),
                                     R.id.frame);
                             break;
                         case Constant.TOP_PAID:
+                            StateShow.setmCategory(Constant.TOP_PAID);
                             mainActivity.setTitle(getResources().getString(R.string.top_paid));
                             UtilsFragment.changeFragment(getActivity().getSupportFragmentManager(),
                                     new ListAppFragment().newInstance(Constant.TOP_PAID,Constant.GRID),
                                     R.id.frame);
                             break;
                         case Constant.TOP_MOVERS_SHAKER:
+                            StateShow.setmCategory(Constant.TOP_MOVERS_SHAKER);
                             mainActivity.setTitle(getResources().getString(R.string.movers_shaker));
                             UtilsFragment.changeFragment(getActivity().getSupportFragmentManager(),
                                     new ListAppFragment().newInstance(Constant.TOP_MOVERS_SHAKER,Constant.GRID),
                                     R.id.frame);
                             break;
                         case Constant.TOP_GROSSING:
+                            StateShow.setmCategory(Constant.TOP_GROSSING);
                             mainActivity.setTitle(getResources().getString(R.string.top_grossing));
                             UtilsFragment.changeFragment(getActivity().getSupportFragmentManager(),
                                     new ListAppFragment().newInstance(Constant.TOP_GROSSING,Constant.GRID),
@@ -86,24 +91,28 @@ public class FragmentCategory extends Fragment {
                 } else {
                     switch (i) {
                         case Constant.TOP_FREE:
+                            StateShow.setmCategory(Constant.TOP_FREE);
                             mainActivity.setTitle(getResources().getString(R.string.top_free));
                             UtilsFragment.changeFragment(getActivity().getSupportFragmentManager(),
                                     new ListAppFragment().newInstance(Constant.TOP_FREE,Constant.LIST),
                                     R.id.frame);
                             break;
                         case Constant.TOP_PAID:
+                            StateShow.setmCategory(Constant.TOP_PAID);
                             mainActivity.setTitle(getResources().getString(R.string.top_paid));
                             UtilsFragment.changeFragment(getActivity().getSupportFragmentManager(),
                                     new ListAppFragment().newInstance(Constant.TOP_PAID,Constant.LIST),
                                     R.id.frame);
                             break;
                         case Constant.TOP_MOVERS_SHAKER:
+                            StateShow.setmCategory(Constant.TOP_MOVERS_SHAKER);
                             mainActivity.setTitle(getResources().getString(R.string.movers_shaker));
                             UtilsFragment.changeFragment(getActivity().getSupportFragmentManager(),
                                     new ListAppFragment().newInstance(Constant.TOP_MOVERS_SHAKER,Constant.LIST),
                                     R.id.frame);
                             break;
                         case Constant.TOP_GROSSING:
+                            StateShow.setmCategory(Constant.TOP_GROSSING);
                             mainActivity.setTitle(getResources().getString(R.string.top_grossing));
                             UtilsFragment.changeFragment(getActivity().getSupportFragmentManager(),
                                     new ListAppFragment().newInstance(Constant.TOP_GROSSING,Constant.LIST),

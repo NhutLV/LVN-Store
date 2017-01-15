@@ -48,6 +48,25 @@ public class DataDemo {
         return apps;
     }
 
+    public ArrayList<AppInfo> checkFavouriteList(ArrayList<AppInfo> apps){
+        for(AppInfo appInfo:apps){
+            appInfo.setFavourite(false);
+        }
+        ArrayList<AppInfo> temp = new ArrayList<>();
+        RealmResults<AppInfo> results = realm.where(AppInfo.class).findAll();
+        temp.addAll(results);
+
+        for(AppInfo appInfo:apps){
+            for (AppInfo app: temp){
+                if(appInfo.getPackage_name().equals(app.getPackage_name())){
+                    appInfo.setFavourite(true);
+                }
+            }
+        }
+
+        return apps;
+    }
+
 
     public static ArrayList<AppInfo> getData(){
         mApps = new ArrayList<>();
