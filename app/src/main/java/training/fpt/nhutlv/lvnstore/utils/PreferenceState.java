@@ -42,6 +42,16 @@ public class PreferenceState {
         return show;
     }
 
+    public void saveLanguage(int language){
+        mEditor.putInt(SettingsFragment.KEY_LANGUAGE,language);
+        mEditor.commit();
+    }
+
+    public int getLanguage(){
+        int language = Integer.parseInt(mSharedPreferences.getString(SettingsFragment.KEY_LANGUAGE,"0"));
+        return language;
+    }
+
     public void setDefault(){
         mEditor.putString(SettingsFragment.KEY_CATEGORY_SHOW,"0");
         mEditor.putString(SettingsFragment.KEY_CATEGORY,"0");

@@ -51,9 +51,7 @@ public class AboutFragment extends Fragment {
 
         menu.findItem(R.id.drop_down).setVisible(false);
         menu.findItem(R.id.about).setVisible(false);
-        if(menu.findItem(R.id.drop_up)!=null)
-            menu.findItem(R.id.drop_up).setVisible(false);
-        if(menu.findItem(R.id.gird_menu)!=null)
-            menu.findItem(R.id.gird_menu).setVisible(false);
+        menu.removeItem(R.id.list_menu);
+        menu.removeItem(R.id.gird_menu);
     }
 }

@@ -63,6 +63,7 @@
 
     <string name="pref_category_filter">Filter</string>
     <string name="pref_title_category">Category</string>
+    <string name="pref_title_category_show">Category Show</string>
 
     <string name="pref_title_rating">App with rate from</string>
     <string name="pref_default_rating">3</string>

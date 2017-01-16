@@ -1,5 +1,6 @@
 package training.fpt.nhutlv.lvnstore.fragments;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -9,9 +10,14 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 
+import org.greenrobot.eventbus.EventBus;
+
 import training.fpt.nhutlv.lvnstore.R;
+import training.fpt.nhutlv.lvnstore.event.ChangeLanguageEvent;
 import training.fpt.nhutlv.lvnstore.lib.PreferenceFragment;
+import training.fpt.nhutlv.lvnstore.utils.PreferenceState;
 import training.fpt.nhutlv.lvnstore.utils.SeekBarDialog;
+import training.fpt.nhutlv.lvnstore.utils.StateShow;
 
 /**
  * Created by LamNT17 on 12/3/2015.
@@ -70,6 +76,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         listLanguage.setSummary(language[Integer.parseInt(pref.getString(KEY_LANGUAGE, "0"))]);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     private int rate;
     public void setRate(int rate) {
         this.rate = rate;
@@ -82,11 +93,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         switch (key) {
-            case KEY_LANGUAGE:
             case KEY_CATEGORY:
             case KEY_CATEGORY_SHOW:
                 ListPreference list = (ListPreference) findPreference(key);
                 list.setSummary(list.getEntry());
+                StateShow.setCategory(new PreferenceState(getActivity()).getStateFragment());
+                break;
+            case KEY_LANGUAGE:
+                ListPreference listLanguage = (ListPreference) findPreference(key);
+                listLanguage.setSummary(listLanguage.getEntry());
+//                EventBus.getDefault().postSticky(new ChangeLanguageEvent(new PreferenceState(getActivity()).getLanguage(),true));
+                Intent intent = getActivity().getIntent();
+                getActivity().finish();
+                startActivity(intent);
                 break;
             case KEY_RELEASE_YEAR:
                 EditTextPreference editTextPreference = (EditTextPreference) findPreference(key);
@@ -114,10 +133,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         menu.findItem(R.id.drop_down).setVisible(false);
         menu.findItem(R.id.setting).setVisible(false);
-        if(menu.findItem(R.id.drop_up)!=null)
-            menu.findItem(R.id.drop_up).setVisible(false);
-        if(menu.findItem(R.id.gird_menu)!=null)
-            menu.findItem(R.id.gird_menu).setVisible(false);
+        menu.removeItem(R.id.list_menu);
+        menu.removeItem(R.id.gird_menu);
     }
 
 }

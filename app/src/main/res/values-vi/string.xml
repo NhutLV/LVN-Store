@@ -63,23 +63,24 @@
 
     <string name="pref_category_filter">Lọc Theo</string>
     <string name="pref_title_category">Danh mục</string>
+    <string name="pref_title_category_show">Dạng hiể thị</string>
 
-    <string name="pref_title_rating">@string/from_rating</string>
+    <string name="pref_title_rating">Xếp hạng ứng dụng theo rating</string>
     <string name="pref_default_rating">3</string>
 
-    <string name="pref_title_release_year">@string/from_year</string>
+    <string name="pref_title_release_year">Năm release ứng dụng</string>
     <string name="pref_default_release_year">2012</string>
 
     <string name="pref_title_sort">@string/sort_by</string>
     <string name="pref_default_sort">Release</string>
     <string name="pref_category_sort">@string/sort</string>
 
-    <string name="pref_title_language">@string/language</string>
+    <string name="pref_title_language">Ngôn ngữ</string>
     <string name="pref_default_language">Tiếng Việt</string>
     <string name="language_english">Tiếng Anh</string>
 
-    <string name="back_button_label">Back</string>
-    <string name="next_button_label">Next</string>
+    <string name="back_button_label">Trở về</string>
+    <string name="next_button_label">Tiếp</string>
 
     <string name="list">Danh sách</string>
     <string name="grid">Dạng lưới</string>
@@ -87,5 +88,5 @@
     <string name="text_price">Miễn Phí</string>
 
     <!-- Optional button to Skip a PreferenceActivity [CHAR LIMIT=20] -->
-    <string name="skip_button_label">Skip</string>
+    <string name="skip_button_label">Bỏ qua</string>
 </resources>

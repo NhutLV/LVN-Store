@@ -19,11 +19,11 @@ public class StateShow {
 
     private static int mCategory = 0;
 
-    public static int getmCategory() {
+    public static int getCategory() {
         return mCategory;
     }
 
-    public static void setmCategory(int category) {
+    public static void setCategory(int category) {
         mCategory = category;
     }
 }

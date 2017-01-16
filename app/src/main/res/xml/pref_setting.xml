@@ -4,39 +4,39 @@
 
     <PreferenceCategory
         android:layout="@android:layout/preference_category"
-        android:title="Filter">
+        android:title="@string/pref_category_filter">
 
         <ListPreference
             android:key="@string/pref_key_category"
-            android:title="Category"
+            android:title="@string/pref_title_category"
             android:entries="@array/list_category"
             android:entryValues="@array/list_category_values"
-            android:dialogTitle="Category" />
+            android:dialogTitle="@string/pref_title_category" />
 
         <Preference
             android:key="@string/pref_key_rating"
-            android:title="Movie with rate from"/>
+            android:title="@string/pref_title_rating"/>
 
         <ListPreference
             android:key="@string/pref_key_category_show"
-            android:title="Category Show"
+            android:title="@string/pref_title_category_show"
             android:entryValues="@array/list_category_show_values"
             android:entries="@array/list_category_show"
-            android:dialogTitle="Category Show"/>
+            android:dialogTitle="@string/pref_title_category_show"/>
     </PreferenceCategory>
 
     <EditTextPreference
         android:key="@string/pref_key_release_year"
         android:title="From Release Year"
-        android:dialogTitle="From Release Year" />
+        android:dialogTitle="@string/pref_title_release_year" />
     <PreferenceCategory
         android:layout="@android:layout/preference_category"
-        android:title="Language">
+        android:title="@string/pref_title_language">
     <ListPreference
         android:key="@string/pref_key_language"
-        android:title="Language"
+        android:title="@string/pref_title_language"
         android:entries="@array/list_language"
         android:entryValues="@array/list_language_values"
-        android:dialogTitle="Sort By" />
+        android:dialogTitle="@string/pref_title_sort" />
     </PreferenceCategory>
 </PreferenceScreen>

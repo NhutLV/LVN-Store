@@ -38,10 +38,9 @@ public class GridAppAdapter extends RecyclerView.Adapter<GridAppAdapter.ListAppV
 
     @Override
     public void onBindViewHolder(ListAppViewHolder holder, int position) {
-
         AppInfo app = mApps.get(position);
         holder.title.setText(app.getTitle());
-        Picasso.with(mContext).load(app.getIcon()).placeholder(R.drawable.image).into(holder.icon);
+        Picasso.with(mContext).load(app.getIcon()).placeholder(R.mipmap.ic_holder).into(holder.icon);
     }
 
     @Override

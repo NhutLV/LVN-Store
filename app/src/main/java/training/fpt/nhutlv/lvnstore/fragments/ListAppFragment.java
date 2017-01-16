@@ -125,7 +125,8 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.fragment_list_app, container, false);
+        LayoutInflater inflater1 = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater1.inflate(R.layout.fragment_list_app, container, false);
         ButterKnife.bind(this, view);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_main);
         avi = (AVLoadingIndicatorView) view.findViewById(R.id.avi);
@@ -205,9 +206,13 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         if (getArguments().getInt("STATE") == Constant.LIST) {
             if (menu.findItem(R.id.gird_menu) != null)
                 menu.findItem(R.id.gird_menu).setVisible(false);
+            if (menu.findItem(R.id.list_menu) != null)
+                menu.findItem(R.id.list_menu).setVisible(true);
         } else {
             if (menu.findItem(R.id.list_menu) != null)
                 menu.findItem(R.id.list_menu).setVisible(false);
+            if (menu.findItem(R.id.gird_menu) != null)
+                menu.findItem(R.id.gird_menu).setVisible(true);
         }
     }
 
@@ -427,9 +432,11 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
     //filter data from setting
     private ArrayList<AppInfo> filterSetting(ArrayList<AppInfo> list, int year, int rating) {
         ArrayList<AppInfo> listResult = new ArrayList<>();
+        int i=0;
         for (AppInfo app : list) {
+            Log.d("CCCCC",app.getTitle()+"- "+app.getCreated()+ " - "+i++);
 //            int releaseYear = Integer.parseInt(app.getCreated().split("-")[0]);
-            if (app.getRating() >= rating) {
+            if (app.getRating() >= rating ) {
                 listResult.add(app);
             }
         }

@@ -22,18 +22,18 @@
         app:showAsAction="always"/>
     <item
         android:id="@+id/app"
-        android:title="Apps"
+        android:title="@string/tab_app"
         app:showAsAction="never"/>
     <item
         android:id="@+id/favorite"
-        android:title="Favourite"
+        android:title="@string/tab_favourite"
         app:showAsAction="never"/>
     <item
         android:id="@+id/setting"
-        android:title="Setting"
+        android:title="@string/tab_setting"
         app:showAsAction="never"/>
     <item
         android:id="@+id/about"
-        android:title="About"
+        android:title="@string/tab_about"
         app:showAsAction="never"/>
 </menu>

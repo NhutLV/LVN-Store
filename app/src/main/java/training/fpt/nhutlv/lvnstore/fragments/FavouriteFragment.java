@@ -92,16 +92,12 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-        super.onCreateOptionsMenu(menu, inflater);
-        MenuItem item = menu.findItem(R.id.list_menu);
-        if (item != null)
-            item.setVisible(false);
         menu.findItem(R.id.drop_down).setVisible(false);
         menu.findItem(R.id.favorite).setVisible(false);
         if (menu.findItem(R.id.drop_up) != null)
             menu.findItem(R.id.drop_up).setVisible(false);
-        if (menu.findItem(R.id.gird_menu) != null)
-            menu.findItem(R.id.gird_menu).setVisible(false);
+        menu.removeItem(R.id.list_menu);
+        menu.removeItem(R.id.gird_menu);
         inflater.inflate(R.menu.menu_favourite, menu);
 
         searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
@@ -163,8 +159,6 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
 
         Log.d("CCCCCCCCCC", "SIZE" + mApps.size());
         final AppInfo app = mApps.get(position);
-        Log.d("CCCCCCCCCC", "SIZE" + app.getTitle());
-        Log.d("CCCCCCCCCC", "SIZE" + position);
         RealmResults<AppInfo> infoRealmResults = realm.where(AppInfo.class).findAll();
         EventBus.getDefault().postSticky(new RemovePositionEvent(position, false, Constant.TAB_FAROURITE, app));
         EventBus.getDefault().postSticky(new NumberFavourite(infoRealmResults.size()));

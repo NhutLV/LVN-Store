@@ -38,6 +38,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -49,6 +50,7 @@ import training.fpt.nhutlv.lvnstore.MyApplication;
 import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.adapters.ViewPagerHomeAdapter;
 import training.fpt.nhutlv.lvnstore.entities.AppInfo;
+import training.fpt.nhutlv.lvnstore.event.ChangeLanguageEvent;
 import training.fpt.nhutlv.lvnstore.event.NumberFavourite;
 import training.fpt.nhutlv.lvnstore.fragments.FragmentCategory;
 import training.fpt.nhutlv.lvnstore.fragments.ListAppFragment;
@@ -59,12 +61,15 @@ import training.fpt.nhutlv.lvnstore.utils.Constant;
 import training.fpt.nhutlv.lvnstore.utils.NetworkChangeReceiver;
 import training.fpt.nhutlv.lvnstore.utils.PreferenceState;
 import training.fpt.nhutlv.lvnstore.utils.StateShow;
+import training.fpt.nhutlv.lvnstore.utils.Utils;
 import training.fpt.nhutlv.lvnstore.utils.UtilsFragment;
 import training.fpt.nhutlv.lvnstore.utils.segmented.SettingLanguage;
 
+import static training.fpt.nhutlv.lvnstore.utils.Utils.mCurrentLocale;
+
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,NetworkChangeReceiver.ConnectivityReceiverListener {
+        implements NavigationView.OnNavigationItemSelectedListener,NetworkChangeReceiver.ConnectivityReceiverListener,ViewPager.OnPageChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -107,6 +112,17 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        int language = new PreferenceState(this).getLanguage();
+        String lang="vi";
+        if(language==0){
+            lang ="vi";
+        }else if(language==1){
+            lang="en";
+        }
+
+        Utils utils = new Utils(this);
+        utils.setLanguage(lang);
 //        new PreferenceState(this).setDefault();
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         ButterKnife.bind(this);
@@ -188,10 +204,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        Log.d("CCCCCCCC SSSS",new PreferenceState(this).getStateFragment()+"");
-        Log.d("CCCCCCCC SSSS",new PreferenceState(this).getStateShow()+"");
-
-        StateShow.setmCategory(new PreferenceState(this).getStateFragment());
+        StateShow.setCategory(new PreferenceState(this).getStateFragment());
     }
 
     @Override
@@ -199,6 +212,16 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         MyApplication.getInstance().setConnectivityListener(this);
         checkConnection();
+        int language = new PreferenceState(this).getLanguage();
+        String lang="vi";
+        if(language==0){
+            lang ="vi";
+        }else if(language==1){
+            lang="en";
+        }
+        if (!lang.equals(mCurrentLocale)) {
+            recreate();
+        }
 //        new SettingLanguage(this).setLanguage("vi");
 //        recreate();
     }
@@ -238,13 +261,13 @@ public class MainActivity extends AppCompatActivity
             case R.id.list_menu:
                 StateShow.setStateShow(Constant.GRID);
                 UtilsFragment.changeFragment(getSupportFragmentManager(),
-                        new ListAppFragment().newInstance(StateShow.getmCategory(), Constant.GRID),
+                        new ListAppFragment().newInstance(StateShow.getCategory(), Constant.GRID),
                         R.id.frame);
                 break;
             case R.id.gird_menu:
                 StateShow.setStateShow(Constant.LIST);
                 UtilsFragment.changeFragment(getSupportFragmentManager(),
-                        new ListAppFragment().newInstance(StateShow.getmCategory(),Constant.LIST),
+                        new ListAppFragment().newInstance(StateShow.getCategory(),Constant.LIST),
                         R.id.frame);
                 break;
             case R.id.drop_down:
@@ -302,11 +325,6 @@ public class MainActivity extends AppCompatActivity
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
-    public void event(NumberFavourite numberFavourite){
-        mNumberFavourite.setText(String.valueOf(numberFavourite.getNumberFavourite()));
-    }
-
     @Override
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
@@ -333,7 +351,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick(View view) {
                     Log.d("TAGGG","CLICK");
-                   checkConnection();
+                    checkConnection();
                     recreate();
                 }
             });
@@ -390,5 +408,36 @@ public class MainActivity extends AppCompatActivity
         }
 
         editor.commit();
+    }
+
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
+    public void event(NumberFavourite numberFavourite){
+        mNumberFavourite.setText(String.valueOf(numberFavourite.getNumberFavourite()));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
+    public void eventLanguage(ChangeLanguageEvent changeLanguageEvent){
+        if(changeLanguageEvent.isMisChange()){
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
+        }
     }
 }
