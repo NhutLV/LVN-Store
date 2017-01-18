@@ -145,9 +145,6 @@ public class MainActivity extends AppCompatActivity
 
         checkConnection();
 
-//        mViewPager = (ViewPager) findViewById(R.id.viewPager);
-//        mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, mToolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -159,11 +156,7 @@ public class MainActivity extends AppCompatActivity
 
         setDefaultSettingValues();
         checkChangeSettingAndReloadData(savedInstanceState);
-//        mAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-//        mAdapter.addFragment(AppsFragment.newInstance(),getResources().getString(R.string.tab_app));
-//        mAdapter.addFragment(FavouriteFragment.newInstance(),getResources().getString(R.string.tab_favourite));
-//        mAdapter.addFragment(SettingFragment.newInstance(),getResources().getString(R.string.tab_setting));
-//        mAdapter.addFragment(AboutFragment.newInstance(),getResources().getString(R.string.tab_about));
+
         mViewPager.setAdapter(mAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.getTabAt(0).setText(getResources().getString(R.string.tab_app)).setIcon(R.drawable.ic_home_white_24dp);

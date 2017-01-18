@@ -75,9 +75,6 @@ public class SignUpActivity extends AppCompatActivity {
                 mRealm.beginTransaction();
                 mRealm.createObject(User.class,user.getEmail());
                 mRealm.commitTransaction();
-
-                RealmResults<User> users = mRealm.where(User.class).findAll();
-                Log.d("TAG",users.size()+"");
             }
         });
 

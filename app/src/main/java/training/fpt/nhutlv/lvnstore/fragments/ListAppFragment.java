@@ -136,7 +136,6 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
             Log.d("TAG MENU", "List");
             mAdapter = new ListAppAdapter(getActivity(), mApps);
             LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-            mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 1));
             mRecyclerView.setLayoutManager(manager);
             mRecyclerView.setAdapter(mAdapter);
             mAdapter.setMyClickDetailLister(this);
@@ -215,32 +214,6 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
                 menu.findItem(R.id.gird_menu).setVisible(true);
         }
     }
-
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-//    public void eventList(RemovePositionEvent positionEvent){
-//        if(positionEvent.isCheck()){
-//            Log.d("TAG","True List");
-//            mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(true);
-//        }else{
-//            Log.d("TAG","False List");
-//            mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(false);
-//        }
-//        mAdapter.notifyDataSetChanged();
-//    }
-    public void eventList(RemovePositionEvent positionEvent) {
-        if (positionEvent.isCheck()) {
-            mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(true);
-            mAdapter.notifyDataSetChanged();
-        } else {
-            if (positionEvent.getTab() == Constant.TAB_LIST) {
-                mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(false);
-                mAdapter.notifyDataSetChanged();
-            } else if (positionEvent.getTab() == Constant.TAB_FAROURITE) {
-                new DataDemo().checkFavouriteList(mApps);
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-    }
     //endregion
 
     private int dpToPx(int dp) {
@@ -248,6 +221,7 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
+    //region load data
     private void showDataByCategory(LinearLayoutManager layoutManager, final String category) {
         if (!avi.isShown())
             avi.show();
@@ -284,7 +258,7 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
                 service.getListByCategoryName(category, 1, new Callback<ArrayList<AppInfo>>() {
                     @Override
                     public void onResult(ArrayList<AppInfo> appInfos) {
-                        mApps.addAll(new DataDemo().checkFavourite(appInfos));
+                        mApps.addAll(filterSetting(new DataDemo().checkFavourite(appInfos),yearRelease,rating));
                         mAdapter.notifyDataSetChanged();
                         (new Handler()).postDelayed(new Runnable() {
                             @Override
@@ -351,7 +325,7 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
                 service.getListByCategoryName(category, 1, new Callback<ArrayList<AppInfo>>() {
                     @Override
                     public void onResult(ArrayList<AppInfo> appInfos) {
-                        mApps.addAll(new DataDemo().checkFavourite(appInfos));
+                        mApps.addAll(filterSetting(new DataDemo().checkFavourite(appInfos),yearRelease,rating));
                         mAdapter.notifyDataSetChanged();
                         (new Handler()).postDelayed(new Runnable() {
                             @Override
@@ -380,6 +354,7 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         });
         mRecyclerView.addOnScrollListener(mScrollListener);
     }
+    //endregion
 
     //onclick item recycler view
     @Override
@@ -401,7 +376,6 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         if (checkBox.isChecked()) {
             app.setFavourite(true);
             app.setImageIcon(UtilsImage.getImageFromUrl(app.getIcon()));
-            Log.d("TAG Image", Arrays.toString(app.getImageIcon()));
 //            for(int i =0;i<app.getScreenshots().size();i++){
 //               new SaveListImage().execute(app.getScreenshots().get(i).toString());
 //            }
@@ -434,7 +408,6 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         ArrayList<AppInfo> listResult = new ArrayList<>();
         int i=0;
         for (AppInfo app : list) {
-            Log.d("CCCCC",app.getTitle()+"- "+app.getCreated()+ " - "+i++);
 //            int releaseYear = Integer.parseInt(app.getCreated().split("-")[0]);
             if (app.getRating() >= rating ) {
                 listResult.add(app);
@@ -478,4 +451,20 @@ public class ListAppFragment extends Fragment implements ListAppAdapter.MyClickD
         super.onDestroyView();
     }
 
+    //receive event bus
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void eventList(RemovePositionEvent positionEvent) {
+        if (positionEvent.isCheck()) {
+            mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(true);
+            mAdapter.notifyDataSetChanged();
+        } else {
+            if (positionEvent.getTab() == Constant.TAB_LIST) {
+                mApps.get(mApps.indexOf(positionEvent.getAppInfo())).setFavourite(false);
+                mAdapter.notifyDataSetChanged();
+            } else if (positionEvent.getTab() == Constant.TAB_FAROURITE) {
+                new DataDemo().checkFavouriteList(mApps);
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    }
 }

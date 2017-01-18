@@ -57,7 +57,7 @@ public class FragmentCategory extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (new PreferenceState(getActivity()).getStateShow() == Constant.GRID) {
+                if (StateShow.getStateShow() == Constant.GRID) {
                     switch (i) {
                         case Constant.TOP_FREE:
                             StateShow.setCategory(Constant.TOP_FREE);

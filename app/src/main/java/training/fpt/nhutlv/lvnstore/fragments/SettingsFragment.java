@@ -102,7 +102,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             case KEY_LANGUAGE:
                 ListPreference listLanguage = (ListPreference) findPreference(key);
                 listLanguage.setSummary(listLanguage.getEntry());
-//                EventBus.getDefault().postSticky(new ChangeLanguageEvent(new PreferenceState(getActivity()).getLanguage(),true));
                 Intent intent = getActivity().getIntent();
                 getActivity().finish();
                 startActivity(intent);

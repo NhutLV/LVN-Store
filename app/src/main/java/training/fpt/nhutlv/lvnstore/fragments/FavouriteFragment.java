@@ -99,11 +99,24 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
         menu.removeItem(R.id.list_menu);
         menu.removeItem(R.id.gird_menu);
         inflater.inflate(R.menu.menu_favourite, menu);
-
-        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setOnQueryTextListener(this);
+        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                // Do something when collapsed
+                return true;  // Return true to collapse action view
+            }
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                mApps.addAll(AppInfoController.getAll());
+                mAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -157,11 +170,10 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
     @Override
     public void onClickFavourite(CheckBox checkBox, int position) {
 
-        Log.d("CCCCCCCCCC", "SIZE" + mApps.size());
         final AppInfo app = mApps.get(position);
         RealmResults<AppInfo> infoRealmResults = realm.where(AppInfo.class).findAll();
         EventBus.getDefault().postSticky(new RemovePositionEvent(position, false, Constant.TAB_FAROURITE, app));
-        EventBus.getDefault().postSticky(new NumberFavourite(infoRealmResults.size()));
+        Log.d("TAGGGG",infoRealmResults.size()+"");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
@@ -175,6 +187,7 @@ public class FavouriteFragment extends Fragment implements SearchView.OnQueryTex
             }else if(positionEvent.getTab()==Constant.TAB_FAROURITE){
                 AppInfoController.deleteAppInfo(positionEvent.getAppInfo());
                 mApps.remove(positionEvent.getPosition());
+                EventBus.getDefault().postSticky(new NumberFavourite(AppInfoController.getAll().size()));
                 mAdapter.notifyDataSetChanged();
             }
         } else {

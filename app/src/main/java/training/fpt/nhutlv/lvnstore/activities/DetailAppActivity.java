@@ -3,27 +3,18 @@ package training.fpt.nhutlv.lvnstore.activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.VideoView;
 
-import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
 import com.squareup.picasso.Picasso;
-
 
 import java.text.DecimalFormat;
 
@@ -33,7 +24,6 @@ import io.realm.RealmList;
 import training.fpt.nhutlv.lvnstore.R;
 import training.fpt.nhutlv.lvnstore.adapters.ScreenShotAdapter;
 import training.fpt.nhutlv.lvnstore.entities.AppInfo;
-import training.fpt.nhutlv.lvnstore.entities.RealmArrayByte;
 import training.fpt.nhutlv.lvnstore.entities.RealmString;
 import training.fpt.nhutlv.lvnstore.model.service.AppInfoServiceImpl;
 import training.fpt.nhutlv.lvnstore.utils.Callback;
@@ -50,9 +40,8 @@ public class DetailAppActivity extends AppCompatActivity {
     RecyclerView mScreenShots;
     ScreenShotAdapter mAdapter;
     RealmList<RealmString> mImages = new RealmList<>();
-    RealmList<RealmArrayByte> mImagesByte = new RealmList<>();
     AppInfo mAppInfo;
-    DecimalFormat df = new DecimalFormat("####0");
+    DecimalFormat df = new DecimalFormat("#,000");
 
     @BindView(R.id.image_detail)
     ImageView mIcon;
@@ -105,7 +94,7 @@ public class DetailAppActivity extends AppCompatActivity {
 
         if(package_name.equals("favourite")){
             final AppInfo appInfo = bundle.getParcelable("APP");
-            mImagesByte = appInfo.getScreenShotImage();
+            mImages = appInfo.getScreenshots();
 //            Picasso.with(DetailAppActivity.this).load(appInfo.getIcon()).placeholder(R.drawable.image).into(mIcon);
             Bitmap bmp = BitmapFactory.decodeByteArray(appInfo.getImageIcon(), 0, appInfo.getImageIcon().length);
             mIcon.setImageBitmap(Bitmap.createScaledBitmap(bmp, 150,
@@ -114,8 +103,9 @@ public class DetailAppActivity extends AppCompatActivity {
             mDeveloper.setText(appInfo.getDeveloper());
             mNumberRating.setText("("+String.valueOf(appInfo.getRating())+")");
             mRatingBar.setNumStars(appInfo.getNumber_rating());
+            mRatingBar.setIsIndicator(true);
             String price = String.valueOf(df.format(appInfo.getPrice_numeric()* Constant.USDTOVN));
-            mPrice.setText(price.equals("0")?getResources().getString(R.string.text_price):price+" vnđ");
+            mPrice.setText(price.equals("000")?getResources().getString(R.string.text_price):price+" VNĐ");
             mDescription.setText(appInfo.getDescription());
             mWhatIsNew.setText(appInfo.getWhat_is_new());
             mUpdateDetail.setText("Update : "+appInfo.getMarket_update());
@@ -131,7 +121,7 @@ public class DetailAppActivity extends AppCompatActivity {
             });
 
             mScreenShots = (RecyclerView) findViewById(R.id.recycler_image_detail);
-            mAdapter = new ScreenShotAdapter(DetailAppActivity.this,mImagesByte);
+            mAdapter = new ScreenShotAdapter(DetailAppActivity.this,mImages);
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(DetailAppActivity.this,LinearLayoutManager.HORIZONTAL,false);
 
@@ -141,7 +131,6 @@ public class DetailAppActivity extends AppCompatActivity {
             new AppInfoServiceImpl(this).getAppInfoByPackageName(package_name, new Callback<AppInfo>() {
                 @Override
                 public void onResult(final AppInfo appInfo) {
-                    Log.d("TAG",appInfo.getTitle());
                     mAppInfo = appInfo;
                     mImages = mAppInfo.getScreenshots();
                     Picasso.with(DetailAppActivity.this).load(appInfo.getIcon()).into(mIcon);
@@ -149,7 +138,9 @@ public class DetailAppActivity extends AppCompatActivity {
                     mDeveloper.setText(appInfo.getDeveloper());
                     mNumberRating.setText("("+String.valueOf(appInfo.getRating())+")");
                     mRatingBar.setNumStars(appInfo.getNumber_rating());
-                    mPrice.setText(String.valueOf(df.format(appInfo.getPrice_numeric()* Constant.USDTOVN))+"vnđ");
+                    mRatingBar.setIsIndicator(true);
+                    String price = String.valueOf(df.format(appInfo.getPrice_numeric()* Constant.USDTOVN));
+                    mPrice.setText(price.equals("000")?getResources().getString(R.string.text_price):price+" VNĐ");
                     mDescription.setText(appInfo.getDescription());
                     mWhatIsNew.setText(appInfo.getWhat_is_new());
                     mUpdateDetail.setText("Update : "+appInfo.getMarket_update());
@@ -165,7 +156,7 @@ public class DetailAppActivity extends AppCompatActivity {
                     });
 
                     mScreenShots = (RecyclerView) findViewById(R.id.recycler_image_detail);
-                    mAdapter = new ScreenShotAdapter(DetailAppActivity.this,mImagesByte);
+                    mAdapter = new ScreenShotAdapter(DetailAppActivity.this,mImages);
 
                     LinearLayoutManager layoutManager = new LinearLayoutManager(DetailAppActivity.this,LinearLayoutManager.HORIZONTAL,false);
 
@@ -174,8 +165,6 @@ public class DetailAppActivity extends AppCompatActivity {
                 }
             });
         }
-
-
     }
 
     @Override

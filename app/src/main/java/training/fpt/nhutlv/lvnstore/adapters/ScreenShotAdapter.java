@@ -26,9 +26,9 @@ import training.fpt.nhutlv.lvnstore.entities.RealmString;
 public class ScreenShotAdapter extends RecyclerView.Adapter<ScreenShotAdapter.ScreenShotViewHolder>{
 
     Context mContext;
-    RealmList<RealmArrayByte> images;
+    RealmList<RealmString> images;
 
-    public ScreenShotAdapter(Context mContext,RealmList<RealmArrayByte> images) {
+    public ScreenShotAdapter(Context mContext,RealmList<RealmString> images) {
         this.mContext = mContext;
         this.images = images;
     }
@@ -41,9 +41,12 @@ public class ScreenShotAdapter extends RecyclerView.Adapter<ScreenShotAdapter.Sc
 
     @Override
     public void onBindViewHolder(ScreenShotViewHolder holder, int position) {
-        Bitmap bmp = BitmapFactory.decodeByteArray(images.get(position).getByteImage(), 0, images.get(position).getByteImage().length);
-        holder.imageView.setImageBitmap(Bitmap.createScaledBitmap(bmp, 100,
-                100, false));
+
+        Picasso.with(mContext).load(images.get(position).getValue()).placeholder(R.mipmap.ic_holder).into(holder.imageView);
+
+//        Bitmap bmp = BitmapFactory.decodeByteArray(images.get(position).getByteImage(), 0, images.get(position).getByteImage().length);
+//        holder.imageView.setImageBitmap(Bitmap.createScaledBitmap(bmp, 100,
+//                100, false));
     }
 
     @Override
